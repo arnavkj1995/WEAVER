@@ -2016,8 +2016,8 @@ class WEAVER(nn.Module):
 
         total_loss = flow_loss.clone()
 
-        rm_loss = losses.get('loss/RM', torch.tensor(0.0, device=device))
-        critic_loss = losses.get('loss/V', torch.tensor(0.0, device=device))
+        rm_loss = losses['loss/RM']
+        critic_loss = losses['loss/V']
         if update_rm:
             total_loss = total_loss + self._rm_loss_coeff * rm_loss + self._critic_loss_coeff * critic_loss
         else:
@@ -2037,7 +2037,7 @@ class WEAVER(nn.Module):
             total_loss = total_loss + self._temporal_loss_coeff * temporal_loss
 
         # Build detached log dict (no graph references for logging)
-        log = {k: v.detach() for k, v in losses.items()}
+        log = {k: v.detach() for k, v in losses.items() if k != 'rewards'}
         log.update({
             'flow/Total Loss': flow_loss.detach(),
             'RM loss': rm_loss.detach(),
@@ -2075,11 +2075,8 @@ class WEAVER(nn.Module):
                     f"obs shape={tuple(value.shape)} actions shape={tuple(actions.shape)}"
                 )
 
-        if gt_rewards is not None:
-            assert gt_rewards.shape[0] == B, (
-                f"gt_rewards batch mismatch: rewards batch={gt_rewards.shape[0]} actions batch={B}; "
-                f"rewards shape={tuple(gt_rewards.shape)} actions shape={tuple(actions.shape)}"
-            )
+        if gt_rewards is None:
+            raise ValueError("WEAVER.forward requires gt_rewards during training.")
 
         # Encode memory frames if memory is enabled
         memory_tokens = None
@@ -2145,44 +2142,43 @@ class WEAVER(nn.Module):
             for key in self._img_keys:
                 losses[f'decoder/{key}'] = F.mse_loss(recon_obs[key], obs[key])
 
-        if gt_rewards is not None:
-            task_embed = self.encode_task(tasks)
-            x1_pred = {}
-            for key in x1:
-                if key not in x_pred:
-                    continue
-                if self._flow_loss.startswith('x-pred'):
-                    x1_pred[key] = x_pred[key].detach()
-                elif self._flow_loss.startswith('v-pred'):
-                    x1_pred[key] = (x0[key] + x_pred[key]).detach()
-                else:
-                    raise NotImplementedError
+        task_embed = self.encode_task(tasks)
+        x1_pred = {}
+        for key in x1:
+            if key not in x_pred:
+                continue
+            if self._flow_loss.startswith('x-pred'):
+                x1_pred[key] = x_pred[key].detach()
+            elif self._flow_loss.startswith('v-pred'):
+                x1_pred[key] = (x0[key] + x_pred[key]).detach()
+            else:
+                raise NotImplementedError
 
-            x1_detached = {k: v.detach() for k, v in x1.items() if k in x1_pred}
-            obs_both = {
-                k: torch.cat([x1_detached[k], x1_pred[k]], dim=0)
-                for k in x1_pred
-            }
-            actions_both = torch.cat([actions, actions], dim=0)
-            task_embed = task_embed.detach()
-            tasks_both = torch.cat([task_embed, task_embed], dim=0)
-            rewards_both = torch.cat([gt_rewards, gt_rewards], dim=0)
+        x1_detached = {k: v.detach() for k, v in x1.items() if k in x1_pred}
+        obs_both = {
+            k: torch.cat([x1_detached[k], x1_pred[k]], dim=0)
+            for k in x1_pred
+        }
+        actions_both = torch.cat([actions, actions], dim=0)
+        task_embed = task_embed.detach()
+        tasks_both = torch.cat([task_embed, task_embed], dim=0)
+        rewards_both = torch.cat([gt_rewards, gt_rewards], dim=0)
 
-            pred_rewards, rm_loss = self.rm.compute_loss(
-                obs=obs_both,
-                actions=actions_both,
-                tasks=tasks_both,
-                gt_rewards=rewards_both,
-            )
-            critic_loss = self.critic.compute_loss(
-                obs=obs_both,
-                actions=actions_both,
-                tasks=tasks_both,
-                rewards=rewards_both,
-            )
-            losses['loss/RM'] = rm_loss
-            losses['loss/V'] = critic_loss
-            losses['rewards'] = pred_rewards[:pred_rewards.shape[0] // 2]
+        pred_rewards, rm_loss = self.rm.compute_loss(
+            obs=obs_both,
+            actions=actions_both,
+            tasks=tasks_both,
+            gt_rewards=rewards_both,
+        )
+        critic_loss = self.critic.compute_loss(
+            obs=obs_both,
+            actions=actions_both,
+            tasks=tasks_both,
+            rewards=rewards_both,
+        )
+        losses['loss/RM'] = rm_loss
+        losses['loss/V'] = critic_loss
+        losses['rewards'] = pred_rewards[:pred_rewards.shape[0] // 2]
 
         return self._aggregate_losses(losses, update_rm)
 

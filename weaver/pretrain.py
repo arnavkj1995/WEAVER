@@ -294,7 +294,7 @@ def main():
                     obs=data['obs'],
                     actions=data['actions'],
                     tasks=data['task'],
-                    gt_rewards=data.get('rewards', None),
+                    gt_rewards=data['rewards'],
                     memory=data.get('memory', None),
                     update_rm=bool(step % cfg.model.rm_update_freq),
                 )

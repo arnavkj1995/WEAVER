@@ -231,29 +231,6 @@ def save_validation_videos(raw_model, valid_video_iter, cfg, img_keys, vid_dir, 
         torch.cuda.empty_cache()
     raw_model.train()
 
-
-def _shape_summary(name: str, value, indent: int = 0) -> list[str]:
-    pad = " " * indent
-    if isinstance(value, torch.Tensor):
-        return [f"{pad}{name}: shape={tuple(value.shape)} dtype={value.dtype} device={value.device}"]
-    if isinstance(value, dict):
-        lines = [f"{pad}{name}:"]
-        for key in sorted(value.keys()):
-            lines.extend(_shape_summary(str(key), value[key], indent + 2))
-        return lines
-    if value is None:
-        return [f"{pad}{name}: None"]
-    return [f"{pad}{name}: {type(value).__name__}"]
-
-
-def print_batch_shapes(data, step: int, accum_idx: int):
-    print(f"=== FINETUNE BATCH SHAPES step={step} accum={accum_idx} ===", flush=True)
-    for key in ["obs", "actions", "memory", "task", "rewards"]:
-        for line in _shape_summary(key, data.get(key, None)):
-            print(line, flush=True)
-    print("=== END FINETUNE BATCH SHAPES ===", flush=True)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, default=os.path.join(os.path.dirname(__file__), "config.yaml"))
@@ -350,14 +327,12 @@ def main():
 
         for accum_idx in range(cfg.training.gradient_accumulation_steps):
             data = move_tensors_to_device(next(train_iter), device="cuda")
-            if master_process and step == 0 and accum_idx == 0:
-                print_batch_shapes(data, step, accum_idx)
             with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
                 total_loss, loss_log = model(
                     obs=data["obs"],
                     actions=data["actions"],
                     tasks=data["task"],
-                    gt_rewards=data.get("rewards", None),
+                    gt_rewards=data["rewards"],
                     memory=data.get("memory", None),
                     update_rm=bool(step % cfg.model.rm_update_freq),
                 )
@@ -395,7 +370,7 @@ def main():
                 import wandb
                 wandb.log({k: v.item() for k, v in loss_log.items()}, step=step)
 
-        if step == 0 or step % cfg.valid_log_freq == 0:
+        if cfg.valid_log_freq > 0 and (step == 0 or step % cfg.valid_log_freq == 0):
             model.eval()
             raw_model.eval()
             if hasattr(valid_loader.sampler, "set_epoch"):
@@ -425,7 +400,7 @@ def main():
             if step % 5000 == 0:
                 save_checkpoint(chkpt_save_dir, model=getattr(raw_model, "_orig_mod", raw_model) if cfg.use_compile else raw_model, optimizer=optimizer, cfg=cfg, step=step, suffix=str(step))
 
-        if step % cfg.video_log_freq == 0 and master_process:
+        if cfg.video_log_freq > 0 and step % cfg.video_log_freq == 0 and master_process:
             save_validation_videos(raw_model, valid_video_iter, cfg, img_keys, vid_dir, step)
 
         if ddp:

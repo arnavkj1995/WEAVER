@@ -136,13 +136,23 @@ Finetuned checkpoints are written to:
 <scratch_dir>/logs/chkpts_<finetune_suffix>/checkpoint.pt
 ```
 
-Slurm entrypoint:
+Plain launcher for local runs or an already allocated node:
 
 ```bash
 PRETRAINED_DIR=/path/to/pretrained/logs/chkpts \
 DATASET_PATH=/path/to/finetune_data \
 FINETUNE_SUFFIX=finetune \
-sbatch scripts/finetune.sh
+bash scripts/finetune.sh
+```
+
+For multi-GPU Slurm runs, submit the dedicated Slurm wrapper:
+
+```bash
+PRETRAINED_DIR=/path/to/pretrained/logs/chkpts \
+DATASET_PATH=/path/to/finetune_data \
+EXP_NAME=weaver_finetune \
+FINETUNE_SUFFIX=finetune \
+sbatch scripts/finetune_h100_ddp.sh
 ```
 
 ### Evaluation
