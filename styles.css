@@ -55,8 +55,8 @@ p {
 h1 {
   max-width: 1100px;
   margin: 0 auto 20px;
-  font-size: clamp(1.85rem, 3.71vw, 3.33rem);
-  font-weight: 500;
+  font-size: clamp(2.04rem, 4.08vw, 3.66rem);
+  font-weight: 800;
   line-height: 1.08;
   letter-spacing: 0;
 }
@@ -136,8 +136,8 @@ h1 {
 .section h2 {
   margin-bottom: 18px;
   text-align: center;
-  font-size: clamp(1.8rem, 3.06vw, 2.7rem);
-  font-weight: 500;
+  font-size: clamp(1.98rem, 3.37vw, 2.97rem);
+  font-weight: 800;
   line-height: 1.12;
 }
 
@@ -224,7 +224,7 @@ h1 {
 .application-block h3 {
   margin-bottom: 10px;
   text-align: center;
-  font-size: clamp(1.22rem, 2.16vw, 1.71rem);
+  font-size: clamp(1.34rem, 2.38vw, 1.88rem);
   font-weight: 700;
   line-height: 1.18;
 }
