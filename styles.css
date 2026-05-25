@@ -28,6 +28,18 @@ body {
   line-height: 1.58;
 }
 
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 4px;
+  background: #1f9d55;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -56,16 +68,26 @@ h1 {
   max-width: 1100px;
   margin: 0 auto 20px;
   font-size: clamp(2.04rem, 4.08vw, 3.66rem);
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1.08;
   letter-spacing: 0;
 }
 
-.authors,
+.authors {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 1.55rem;
+}
+
 .affiliations {
   margin-bottom: 8px;
   color: var(--muted);
-  font-size: 1.31rem;
+  font-size: 1.18rem;
+}
+
+.authors sup,
+.affiliations sup {
+  font-size: 0.68em;
 }
 
 .authors a {
@@ -76,22 +98,23 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  margin: 28px 0 30px;
+  gap: 17px;
+  margin: 32px 0 34px;
 }
 
 .project-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  min-width: 112px;
-  min-height: 46px;
-  padding: 0 17px;
+  gap: 13px;
+  min-width: 157px;
+  min-height: 64px;
+  padding: 0 24px;
   border: 1px solid #d6dbe5;
   border-radius: 999px;
   background: #fff;
   color: #252932;
+  font-size: 1.4rem;
   font-weight: 700;
   box-shadow: 0 8px 18px rgba(32, 33, 36, 0.1);
 }
@@ -110,8 +133,8 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   background: #eef3ff;
   color: var(--blue);
@@ -119,8 +142,8 @@ h1 {
 
 .icon img {
   display: block;
-  width: 15px;
-  height: 15px;
+  width: 21px;
+  height: 21px;
 }
 
 .section {
@@ -137,8 +160,16 @@ h1 {
   margin-bottom: 18px;
   text-align: center;
   font-size: clamp(1.98rem, 3.37vw, 2.97rem);
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1.12;
+}
+
+.subsection-title {
+  margin-bottom: 14px;
+  text-align: center;
+  font-size: clamp(1.34rem, 2.38vw, 1.88rem);
+  font-weight: 500;
+  line-height: 1.18;
 }
 
 .section p {

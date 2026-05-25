@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="scroll-progress" aria-hidden="true"></div>
     <header class="site-header">
       <div class="hero">
         <h1>
@@ -23,12 +24,15 @@
           for Robotic Manipulation
         </h1>
         <p class="authors">
-          Arnav Kumar Jain<sup>*</sup>, Yilin Wu<sup>*</sup>, Jesse
-          Farebrother, Gokul Swamy, Andrea Bajcsy
+          Arnav Kumar Jain<sup>1,2,*</sup>, Yilin Wu<sup>3,*</sup>,
+          Jesse Farebrother<sup>1,4</sup>, Gokul Swamy<sup>3</sup>,
+          Andrea Bajcsy<sup>3</sup>
         </p>
         <p class="affiliations">
-          Mila - Quebec AI Institute, Universite de Montreal, McGill
-          University, Carnegie Mellon University
+          <sup>1</sup>Mila - Quebec AI Institute &nbsp;
+          <sup>2</sup>Universite de Montreal &nbsp;
+          <sup>3</sup>Carnegie Mellon University &nbsp;
+          <sup>4</sup>McGill University
         </p>
         <div class="link-row" aria-label="Project links">
           <a class="project-link disabled" href="#paper" aria-disabled="true">
@@ -135,6 +139,12 @@
             src="assets/weaver-architecture.png"
             alt="WEAVER architecture diagram."
           />
+          <!-- <figcaption>
+            <strong><code>WEAVER</code> architecture.</strong> Memory, history,
+            and action sequences are encoded to generate future imaginations in
+            latent space; a latent verifier with reward and critic heads selects
+            high-advantage samples.
+          </figcaption> -->
         </figure>
         <div class="method-copy">
           <p>
@@ -188,48 +198,46 @@
             alt="World model evaluation comparing WEAVER and Ctrl-World on FID, FVD, and inference time."
           />
           <!-- <figcaption>
-            World-model evaluation on DROID validation and out-of-distribution
-            task data. <code>WEAVER</code> improves FID/FVD over Ctrl-World while requiring
-            less inference time, especially at low NFE.
+            <strong>World-model evaluation.</strong>
+            <code>WEAVER</code>
+            generates higher-fidelity rollouts than Ctrl-World and performs
+            substantially better at low inference budgets.
           </figcaption> -->
         </figure>
       </section>
 
       <section class="section result-section">
-        <h2>Latent Verifier and Planning</h2>
+        <h3 class="subsection-title">Latent Verifier and Planning</h3>
         <p class="section-lede">
-          <code>WEAVER</code>'s latent reward estimates match RoboMeter reward trends on
-          held-out real trajectories and can distinguish action samples by
-          predicted advantage.
+          <code>WEAVER</code>'s latent reward is trained to match RoboMeter's task progress rewards. 
+          On OOD real trajectories, the distilled reward model can distinguish action chunks using the
+          predicted advantage. We observe that the segment with highest-advantage action sample corresponds
+          to the best imagined outcome.
         </p>
         <figure class="paper-figure">
           <img
             src="assets/weaver-reward.png"
             alt="Reward prediction and advantage filtering plot."
           />
-          <figcaption>
-            Predicted rewards track task progress, while advantage filtering
-            identifies action samples with better imagined outcomes.
-          </figcaption>
         </figure>
       </section>
 
       <section class="section result-section downstream-applications">
         <h2>Downstream applications</h2>
         <p class="section-lede">
-          The paper evaluates five real-world manipulation tasks: Stack Bowls,
-          PnP Bag, PnP Marker, PnP Towel, and Pour Beans. <code>WEAVER</code>
-          supports three downstream applications: policy evaluation, finetuning
-          policies inside the world model, and test-time steering.
+          By jointly satisfying fidelity, consistency, and efficiency,
+          <code>WEAVER</code> supports three downstream world-model applications:
+          policy evaluation, policy improvement, and test-time planning.
         </p>
 
         <div class="application-block">
           <h3>Policy Evaluation</h3>
           <p>
-            <code>WEAVER</code> can act as a learned simulator for offline policy
-            evaluation: imagined success rates track real-world success rates
-            across policies and tasks, with the fine-tuned model reaching rho =
-            0.870.
+            To evaluate a policy offline, we execute recorded real-world action
+            trajectories open-loop inside <code>WEAVER</code> and record the
+            predicted rewards along the imagined rollout. This tests whether
+            the world model can track long-horizon outcomes that may require
+            many iterative latent-dynamics evaluations.
           </p>
           <figure class="paper-figure policy-eval-figure">
             <img
@@ -237,8 +245,9 @@
               alt="Policy evaluation plot comparing imagined and real-world success rates."
             />
             <figcaption>
-              Policy evaluation with <code>WEAVER</code>: imagined rollout outcomes
-              align with real-world policy performance better after fine-tuning.
+              <strong>Policy evaluation.</strong> Imagined success rates from
+              the fine-tuned <code>WEAVER</code> model correlate more closely
+              with real-world policy performance.
             </figcaption>
           </figure>
         </div>
@@ -246,9 +255,12 @@
         <div class="application-block">
           <h3>Finetuning Policy</h3>
           <p>
-            Finetuning on synthetic segments generated by <code>WEAVER</code>
-            closely matches real-data finetuning, while combining real and
-            synthetic segments performs best.
+            For policy improvement, <code>WEAVER</code> samples candidate
+            action chunks, simulates their long-horizon outcomes, and computes
+            an imagined advantage using the latent reward and critic heads. Only
+            high-advantage rollouts are distilled back into the base policy,
+            avoiding updates from plans predicted to be worse than the current
+            behavior.
           </p>
           <figure class="paper-figure medium-figure">
             <img
@@ -256,7 +268,9 @@
               alt="Policy improvement success rates across tasks."
             />
             <figcaption>
-              Policy improvement with real, synthetic, and mixed data sources.
+              <strong>Policy improvement with finetuning.</strong> Finetuning
+              pi_0.5 with real and synthetic data generated by
+              <code>WEAVER</code> yields the strongest success rates.
             </figcaption>
           </figure>
         </div>
@@ -264,9 +278,12 @@
         <div class="application-block">
           <h3>Test-time Steering</h3>
           <p>
-            Advantage-based steering samples candidate action chunks in
-            <code>WEAVER</code>, scores imagined futures, and selects actions
-            with better predicted outcomes.
+            At test time, <code>WEAVER</code> performs a single-chunk
+            best-of-N search: it samples multiple candidate action chunks,
+            imagines their outcomes for one planning step, and executes the
+            action with the highest predicted advantage. Fast latent dynamics
+            and latent reward scoring make this practical without external VLM
+            judging.
           </p>
           <figure class="paper-figure small-figure">
             <img
@@ -274,7 +291,9 @@
               alt="Test-time planning success rates across tasks."
             />
             <figcaption>
-              Advantage-based test-time planning improves average success rate.
+              <strong>Test-time steering.</strong> Advantage-based action
+              selection improves task success over the base policy across
+              real-world trials.
             </figcaption>
           </figure>
         </div>
@@ -316,5 +335,23 @@
         the NeRFies-style template used by FOREWARN.
       </p>
     </footer>
+    <script>
+      const progressBar = document.querySelector(".scroll-progress");
+
+      function updateScrollProgress() {
+        const scrollableHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const progress =
+          scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+        progressBar.style.transform = `scaleX(${Math.min(
+          Math.max(progress, 0),
+          1,
+        )})`;
+      }
+
+      updateScrollProgress();
+      window.addEventListener("scroll", updateScrollProgress, { passive: true });
+      window.addEventListener("resize", updateScrollProgress);
+    </script>
   </body>
 </html>
