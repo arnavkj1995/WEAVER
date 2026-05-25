@@ -70,8 +70,9 @@
     <main>
       <section class="section teaser-section" aria-label="WEAVER teaser">
         <p class="section-lede teaser-lede">
-          <code>WEAVER</code> is a robot world model that satisfies three desiderata:
-          high fidelity, long-horizon consistency, and efficient generation.
+          We introduce <code>WEAVER</code>: a world model architecture that satisfies the three desiderata: (i) fidelity, (ii) consistency, and (iii) efficiency. <code>WEAVER</code> unlocks state-of-the-art performance across policy evaluation (<i>ρ</i> = 0.870 correlation with real-world success rate), policy improvement (real-world success rate improvement of 38% on top of the <i>π</i><sub>0.5</sub> robot foundation model), and test-time planning (real-world success rate improvement of 14% with a 5–10× speedup over prior WMs).
+          <!-- <code>WEAVER</code> is a robot world model that satisfies three desiderata: -->
+          <!-- high fidelity, long-horizon consistency, and efficient generation. -->
         </p>
         <figure class="paper-figure hero-figure">
           <img
@@ -82,21 +83,21 @@
 
         <div class="feature-list">
           <article>
-            <h3>Multi-view fidelity</h3>
+            <h3>Fidelity</h3>
             <p>
               <code>WEAVER</code> predicts both external and wrist-camera observations,
               preserving the views used by modern visuomotor robot policies.
             </p>
           </article>
           <article>
-            <h3>Long-horizon memory</h3>
+            <h3>Consistency</h3>
             <p>
               Sparse memory plus short-term history helps the model remain
               coherent as objects become occluded or leave and re-enter view.
             </p>
           </article>
           <article>
-            <h3>Fast latent scoring</h3>
+            <h3>Efficiency</h3>
             <p>
               Reward and critic heads operate directly on imagined latents,
               avoiding expensive decoding and external judge calls during
@@ -106,7 +107,7 @@
         </div>
       </section>
 
-      <section id="abstract" class="section narrow">
+      <!-- <section id="abstract" class="section narrow">
         <h2>Abstract</h2>
         <p>
           The potential impacts of world models, or learned simulators, on
@@ -125,33 +126,54 @@
           pi_0.5 robot foundation model, and test-time planning with a 14-15%
           success-rate gain plus a 5-10x speedup over prior world models.
         </p>
-      </section>
+      </section> -->
 
       <section id="method" class="section">
         <h2>Method</h2>
-        <p class="section-lede">
-          <code>WEAVER</code> predicts multi-view robot futures in latent space. It encodes
-          memory, recent history, and candidate action sequences; rolls future
-          latents forward with a flow-matching dynamics model; and uses latent
-          reward and critic heads to score imagined outcomes.
-        </p>
-
         <figure class="paper-figure">
           <img
             src="assets/weaver-architecture.png"
             alt="WEAVER architecture diagram."
           />
-          <figcaption>
-            Architecture: memory, history, and action sequences are encoded to
-            generate future imaginations in latent space. A latent verifier
-            selects high-advantage samples for policy improvement and planning.
-          </figcaption>
         </figure>
+        <div class="method-copy">
+          <p>
+            <code>WEAVER</code> is an action-conditioned latent world model for
+            long-horizon robot manipulation. It predicts future latent states,
+            decodes future observations when needed, and plans in latent space.
+            The key design decisions are:
+          </p>
+          <div class="method-prose">
+            <p>
+              <strong>Architecture and design.</strong> <code>WEAVER</code>
+              predicts multiple views and robot proprioceptive state. The
+              sparse long-term memory preserves scene context across occlusions,
+              short-term history captures recent motion, and an efficient
+              spatio-temporal Transformer generates future latents conditioned
+              on the action tokens.
+            </p>
+            <p>
+              <strong>Training and fast inference.</strong> The latent dynamics
+              model is trained with flow matching and Diffusion Forcing, which
+              supports consistent long-horizon prediction with different noise
+              levels across future steps. At inference time, KV caching and
+              rectified-flow post-training reduce the cost for planning.
+            </p>
+            <p>
+              <strong>Accurate reward and value estimation.</strong> To
+              efficiently score action chunks without decoding latents into
+              images or querying an external VLM judge, <code>WEAVER</code>
+              uses a lightweight reward head that operates directly on imagined
+              latent states and the language instruction. A critic estimates
+              returns beyond the imagined horizon.
+            </p>
+          </div>
+        </div>
 
       </section>
 
       <section id="results" class="section result-section">
-        <h2>World Model Quality</h2>
+        <h2>World Model Evaluation</h2>
         <p class="section-lede">
           Compared with Ctrl-World, <code>WEAVER</code> generates higher-fidelity rollouts
           under lower inference budgets and preserves quality over longer
@@ -172,7 +194,7 @@
       </section>
 
       <section class="section result-section">
-        <h2>Reward Prediction and Planning</h2>
+        <h2>Latent Verifier and Planning</h2>
         <p class="section-lede">
           <code>WEAVER</code>'s latent reward estimates match RoboMeter reward trends on
           held-out real trajectories and can distinguish action samples by

@@ -233,6 +233,28 @@ h1 {
   margin-bottom: 18px;
 }
 
+.method-copy {
+  margin-top: 24px;
+}
+
+.method-prose {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.method-prose p {
+  margin-bottom: 0;
+  padding: 20px 22px;
+  border-left: 5px solid #9aa3af;
+  border-radius: 8px;
+  background: #f3f4f6;
+}
+
+.method-prose strong {
+  color: var(--ink);
+}
+
 .figure-grid {
   display: grid;
   gap: 18px;
@@ -537,8 +559,8 @@ h1 {
 }
 
 .feature-list article:nth-child(1) {
-  border-color: #4f8fd7;
-  background: #eef5ff;
+  border-color: #a78bfa;
+  background: #f3efff;
 }
 
 .feature-list article:nth-child(2) {
