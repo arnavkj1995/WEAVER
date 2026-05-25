@@ -83,25 +83,25 @@
 
         <div class="feature-list">
           <article>
-            <h3>Fidelity</h3>
+            <h3>(i) Fidelity</h3>
             <p>
-              <code>WEAVER</code> predicts both external and wrist-camera observations,
-              preserving the views used by modern visuomotor robot policies.
+              Physically accurate predictions that correlate with reality; 
+              <code>WEAVER</code> generates multiple views used by
+              modern visuomotor policies.
             </p>
           </article>
           <article>
-            <h3>Consistency</h3>
+            <h3>(ii) Consistency</h3>
             <p>
-              Sparse memory plus short-term history helps the model remain
-              coherent as objects become occluded or leave and re-enter view.
+              Coherent predictions over long horizons; <code>WEAVER</code> uses
+              sparse memory and short-term history to handle occlusions.
             </p>
           </article>
           <article>
-            <h3>Efficiency</h3>
+            <h3>(iii) Efficiency</h3>
             <p>
-              Reward and critic heads operate directly on imagined latents,
-              avoiding expensive decoding and external judge calls during
-              planning.
+              Fast enough for downstream planning; reward and critic heads on
+              imagined latents avoid expensive decoding and external judges.
             </p>
           </article>
         </div>
@@ -175,21 +175,23 @@
       <section id="results" class="section result-section">
         <h2>World Model Evaluation</h2>
         <p class="section-lede">
-          Compared with Ctrl-World, <code>WEAVER</code> generates higher-fidelity rollouts
-          under lower inference budgets and preserves quality over longer
-          horizons. The paper reports lower FID/FVD on DROID validation and
-          out-of-distribution task data while using less inference time.
+          <code>WEAVER</code> achieves better performance than Ctrl-World on DROID
+          validation and out-of-distribution (OOD) task data while using significantly lower inference time.
+          As we decrease the number of function evaluations (NFE) to reduce
+          latency, Ctrl-World's quality decreases more significantly than
+          <code>WEAVER</code>; both models incur the highest error when
+          predicting wrist-camera viewpoints.
         </p>
         <figure class="paper-figure full-figure">
           <img
             src="assets/weaver-world-model-eval.png"
             alt="World model evaluation comparing WEAVER and Ctrl-World on FID, FVD, and inference time."
           />
-          <figcaption>
+          <!-- <figcaption>
             World-model evaluation on DROID validation and out-of-distribution
             task data. <code>WEAVER</code> improves FID/FVD over Ctrl-World while requiring
             less inference time, especially at low NFE.
-          </figcaption>
+          </figcaption> -->
         </figure>
       </section>
 

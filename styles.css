@@ -547,14 +547,14 @@ h1 {
 .feature-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  max-width: 100%;
-  margin: 26px auto 0;
+  gap: 14px;
+  max-width: 980px;
+  margin: 22px auto 0;
 }
 
 .feature-list article {
-  padding: 24px;
-  border-left: 5px solid;
+  padding: 18px;
+  border-left: 4px solid;
   border-radius: 8px;
 }
 
@@ -575,11 +575,23 @@ h1 {
 
 .feature-list h3,
 .resources h2 {
-  margin-bottom: 8px;
-  text-align: left;
+  margin-bottom: 6px;
   font-family: inherit;
-  font-size: 1.12rem;
+  font-size: 1.04rem;
   font-weight: 800;
+}
+
+.feature-list p {
+  font-size: 1.18rem;
+  line-height: 1.45;
+}
+
+.feature-list h3 {
+  text-align: center;
+}
+
+.resources h2 {
+  text-align: left;
 }
 
 .resources a {
