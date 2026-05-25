@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="WEAVER: an effective world model for robotic manipulation."
+    />
+    <meta property="og:title" content="WEAVER" />
+    <meta
+      property="og:description"
+      content="Better, faster, longer world models for robotic manipulation."
+    />
+    <title>WEAVER | An Effective World Model for Robotic Manipulation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="hero">
+        <h1>
+          <code>WEAVER</code>, Better, Faster, Longer: An Effective World Model
+          for Robotic Manipulation
+        </h1>
+        <p class="authors">
+          Arnav Kumar Jain<sup>*</sup>, Yilin Wu<sup>*</sup>, Jesse
+          Farebrother, Gokul Swamy, Andrea Bajcsy
+        </p>
+        <p class="affiliations">
+          Mila - Quebec AI Institute, Universite de Montreal, McGill
+          University, Carnegie Mellon University
+        </p>
+        <div class="link-row" aria-label="Project links">
+          <a class="project-link disabled" href="#paper" aria-disabled="true">
+            <span class="icon" aria-hidden="true">
+              <img src="assets/icons/arxiv.svg" alt="" />
+            </span>
+            arXiv
+          </a>
+          <a class="project-link disabled" href="#paper" aria-disabled="true">
+            <span class="icon" aria-hidden="true">
+              <img src="assets/icons/file-pdf.svg" alt="" />
+            </span>
+            Paper
+          </a>
+          <a
+            class="project-link"
+            href="https://github.com/arnavkj1995/WEAVER"
+            rel="noreferrer"
+          >
+            <span class="icon" aria-hidden="true">
+              <img src="assets/icons/github.svg" alt="" />
+            </span>
+            Code
+          </a>
+          <a class="project-link disabled" href="#data" aria-disabled="true">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <ellipse cx="12" cy="5" rx="7" ry="3" />
+                <path d="M5 5v14c0 1.7 3.1 3 7 3s7-1.3 7-3V5" />
+                <path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" />
+              </svg>
+            </span>
+            Data
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section teaser-section" aria-label="WEAVER teaser">
+        <p class="section-lede teaser-lede">
+          <code>WEAVER</code> is a robot world model that satisfies three desiderata:
+          high fidelity, long-horizon consistency, and efficient generation.
+        </p>
+        <figure class="paper-figure hero-figure">
+          <img
+            src="assets/weaver-overview.png"
+            alt="WEAVER overview showing world-model uses for policy evaluation, policy improvement, and test-time planning."
+          />
+        </figure>
+
+        <div class="feature-list">
+          <article>
+            <h3>Multi-view fidelity</h3>
+            <p>
+              <code>WEAVER</code> predicts both external and wrist-camera observations,
+              preserving the views used by modern visuomotor robot policies.
+            </p>
+          </article>
+          <article>
+            <h3>Long-horizon memory</h3>
+            <p>
+              Sparse memory plus short-term history helps the model remain
+              coherent as objects become occluded or leave and re-enter view.
+            </p>
+          </article>
+          <article>
+            <h3>Fast latent scoring</h3>
+            <p>
+              Reward and critic heads operate directly on imagined latents,
+              avoiding expensive decoding and external judge calls during
+              planning.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="abstract" class="section narrow">
+        <h2>Abstract</h2>
+        <p>
+          The potential impacts of world models, or learned simulators, on
+          robotics are far-reaching: policy evaluation, policy improvement, and
+          test-time planning, all with limited real-world interaction. To unlock
+          these downstream capabilities, a world model needs to jointly satisfy
+          three desiderata: fidelity, consistency, and efficiency.
+          We propose <code>WEAVER</code>, World Estimation Across Views for Embodied
+          Reasoning: a multi-view world model trained to predict future latents
+          and reward values via a flow-matching loss. <code>WEAVER</code> distills key design
+          decisions across model architecture, memory, and prediction objectives
+          to support long-horizon dynamic manipulation tasks that have
+          confounded prior world modeling approaches. On robotic hardware, <code>WEAVER</code> demonstrates effective policy evaluation
+          with rho = 0.870 correlation to real-world success rate, policy
+          improvement with a 38% real-world success-rate gain on top of the
+          pi_0.5 robot foundation model, and test-time planning with a 14-15%
+          success-rate gain plus a 5-10x speedup over prior world models.
+        </p>
+      </section>
+
+      <section id="method" class="section">
+        <h2>Method</h2>
+        <p class="section-lede">
+          <code>WEAVER</code> predicts multi-view robot futures in latent space. It encodes
+          memory, recent history, and candidate action sequences; rolls future
+          latents forward with a flow-matching dynamics model; and uses latent
+          reward and critic heads to score imagined outcomes.
+        </p>
+
+        <figure class="paper-figure">
+          <img
+            src="assets/weaver-architecture.png"
+            alt="WEAVER architecture diagram."
+          />
+          <figcaption>
+            Architecture: memory, history, and action sequences are encoded to
+            generate future imaginations in latent space. A latent verifier
+            selects high-advantage samples for policy improvement and planning.
+          </figcaption>
+        </figure>
+
+      </section>
+
+      <section id="results" class="section result-section">
+        <h2>World Model Quality</h2>
+        <p class="section-lede">
+          Compared with Ctrl-World, <code>WEAVER</code> generates higher-fidelity rollouts
+          under lower inference budgets and preserves quality over longer
+          horizons. The paper reports lower FID/FVD on DROID validation and
+          out-of-distribution task data while using less inference time.
+        </p>
+        <figure class="paper-figure full-figure">
+          <img
+            src="assets/weaver-world-model-eval.png"
+            alt="World model evaluation comparing WEAVER and Ctrl-World on FID, FVD, and inference time."
+          />
+          <figcaption>
+            World-model evaluation on DROID validation and out-of-distribution
+            task data. <code>WEAVER</code> improves FID/FVD over Ctrl-World while requiring
+            less inference time, especially at low NFE.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="section result-section">
+        <h2>Reward Prediction and Planning</h2>
+        <p class="section-lede">
+          <code>WEAVER</code>'s latent reward estimates match RoboMeter reward trends on
+          held-out real trajectories and can distinguish action samples by
+          predicted advantage.
+        </p>
+        <figure class="paper-figure">
+          <img
+            src="assets/weaver-reward.png"
+            alt="Reward prediction and advantage filtering plot."
+          />
+          <figcaption>
+            Predicted rewards track task progress, while advantage filtering
+            identifies action samples with better imagined outcomes.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="section result-section downstream-applications">
+        <h2>Downstream applications</h2>
+        <p class="section-lede">
+          The paper evaluates five real-world manipulation tasks: Stack Bowls,
+          PnP Bag, PnP Marker, PnP Towel, and Pour Beans. <code>WEAVER</code>
+          supports three downstream applications: policy evaluation, finetuning
+          policies inside the world model, and test-time steering.
+        </p>
+
+        <div class="application-block">
+          <h3>Policy Evaluation</h3>
+          <p>
+            <code>WEAVER</code> can act as a learned simulator for offline policy
+            evaluation: imagined success rates track real-world success rates
+            across policies and tasks, with the fine-tuned model reaching rho =
+            0.870.
+          </p>
+          <figure class="paper-figure policy-eval-figure">
+            <img
+              src="assets/sr_correlation_plot.png"
+              alt="Policy evaluation plot comparing imagined and real-world success rates."
+            />
+            <figcaption>
+              Policy evaluation with <code>WEAVER</code>: imagined rollout outcomes
+              align with real-world policy performance better after fine-tuning.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="application-block">
+          <h3>Finetuning Policy</h3>
+          <p>
+            Finetuning on synthetic segments generated by <code>WEAVER</code>
+            closely matches real-data finetuning, while combining real and
+            synthetic segments performs best.
+          </p>
+          <figure class="paper-figure medium-figure">
+            <img
+              src="assets/task_success_rate_mean.png"
+              alt="Policy improvement success rates across tasks."
+            />
+            <figcaption>
+              Policy improvement with real, synthetic, and mixed data sources.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="application-block">
+          <h3>Test-time Steering</h3>
+          <p>
+            Advantage-based steering samples candidate action chunks in
+            <code>WEAVER</code>, scores imagined futures, and selects actions
+            with better predicted outcomes.
+          </p>
+          <figure class="paper-figure small-figure">
+            <img
+              src="assets/task_success_rate_mean_tts.png"
+              alt="Test-time planning success rates across tasks."
+            />
+            <figcaption>
+              Advantage-based test-time planning improves average success rate.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="code" class="section resources">
+        <article id="paper">
+          <h2>Paper</h2>
+          <p>Paper and arXiv links will be added when public.</p>
+        </article>
+        <article>
+          <h2>Code</h2>
+          <p>
+            The implementation is available at
+            <a href="https://github.com/arnavkj1995/WEAVER" rel="noreferrer">
+              github.com/arnavkj1995/WEAVER</a
+            >.
+          </p>
+        </article>
+        <article id="data">
+          <h2>Data</h2>
+          <p>Dataset, checkpoints, and evaluation artifacts will be linked here.</p>
+        </article>
+      </section>
+
+      <section id="bibtex" class="section narrow">
+        <h2>BibTeX</h2>
+        <pre><code>@article{jain2026weaver,
+  title={WEAVER, Better, Faster, Longer: An Effective World Model for Robotic Manipulation},
+  author={Jain, Arnav Kumar and Wu, Yilin and Farebrother, Jesse and Swamy, Gokul and Bajcsy, Andrea},
+  year={2026}
+}</code></pre>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Website layout inspired by classic academic project pages, including
+        the NeRFies-style template used by FOREWARN.
+      </p>
+    </footer>
+  </body>
+</html>
