@@ -244,6 +244,223 @@ h1 {
   padding-top: 21px;
 }
 
+.video-block {
+  margin-top: 26px;
+}
+
+.video-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.video-label {
+  color: var(--ink);
+  font-size: 1.18rem;
+  font-weight: 700;
+}
+
+.task-select {
+  padding: 8px 36px 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.task-select:hover {
+  border-color: #aab4c3;
+}
+
+.video-figure video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #000;
+}
+
+.video-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.video-wrap video {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #000;
+}
+
+.row-labels {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+}
+
+.row-label {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.video-grid.two-col {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tts-panel {
+  margin-top: 26px;
+}
+
+.tts-video-figure {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.tts-chunk-heading {
+  margin: 26px auto 12px;
+  text-align: center;
+  color: var(--ink);
+  font-size: 1.18rem;
+  font-weight: 700;
+}
+
+.tts-chunk-figure {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.tts-chunk-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.sample-labels {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+}
+
+.sample-label {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.tts-chunk-figure img {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #000;
+}
+
+.tts-video-figure figcaption,
+.tts-chunk-figure figcaption {
+  padding: 10px 6px 0;
+  text-align: center;
+  font-size: 1.04rem;
+  line-height: 1.4;
+}
+
+.tts-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 760px;
+  margin: 22px auto 0;
+}
+
+.tts-slider-label {
+  color: var(--ink);
+  font-size: 1.12rem;
+  font-weight: 700;
+}
+
+.tts-slider {
+  flex: 1 1 auto;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  appearance: none;
+  cursor: pointer;
+}
+
+.tts-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 2px 6px rgba(32, 33, 36, 0.3);
+  cursor: pointer;
+}
+
+.tts-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 2px 6px rgba(32, 33, 36, 0.3);
+  cursor: pointer;
+}
+
+.tts-slider-value {
+  min-width: 2.2em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.video-grid .video-figure figcaption {
+  padding: 10px 6px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 1.12rem;
+  font-weight: 700;
+}
+
 .downstream-applications .section-lede {
   margin-bottom: 24px;
 }
@@ -708,6 +925,10 @@ pre code {
 
   .rollout-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .video-grid {
+    grid-template-columns: 1fr;
   }
 
   .resources,
