@@ -353,8 +353,7 @@
           <h3>Finetuning Policy</h3>
           <p>
             For policy improvement, <code>WEAVER</code> samples candidate
-            action chunks, simulates their long-horizon outcomes, and computes
-            an imagined advantage using the latent reward and critic heads. Only
+            action chunks, simulates their long-horizon outcomes, and estimates the advantage using the latent reward and critic heads. Only
             high-advantage rollouts are distilled back into the base policy,
             avoiding updates from plans predicted to be worse than the current
             behavior. We observe that finetuning &pi;<sub>0.5</sub> with real and 
@@ -420,13 +419,19 @@
         <div class="application-block">
           <h3>Test-time Steering</h3>
           <p>
-            At test time, <code>WEAVER</code> performs a single-chunk
+            At test time, <code>WEAVER</code> performs single-chunk best-of-N search: it samples
+            multiple candidate action chunks, imagines their outcomes, and executes the one
+            with the highest predicted advantage. To reduce latency, we post-train the world
+            model with rectified flows, enabling fast latent rollouts and reward scoring.
+            This makes test-time planning practical without pixel reconstruction or external
+            VLM-as-a-judge scoring.
+            <!-- At test time, <code>WEAVER</code> performs a single-chunk
             best-of-N search: it samples multiple candidate action chunks,
             imagines their outcomes and executes the
             action with the highest predicted advantage. To reduce inference latency, we 
             post-train the world model with rectified flows. The fast latent dynamics
             and latent reward scoring of <code>WEAVER</code> makes test-time planning practical 
-            without external VLM judging.
+            without external VLM judging. -->
           </p>
           <div class="tts-panel" id="tts-panel">
             <div class="video-controls">
