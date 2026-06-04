@@ -79,7 +79,7 @@ p {
 h1 {
   max-width: 1100px;
   margin: 0 auto 20px;
-  font-size: clamp(2.04rem, 4.08vw, 3.66rem);
+  font-size: clamp(1.84rem, 3.67vw, 3.29rem);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: 0;
@@ -1068,7 +1068,7 @@ pre code {
   }
 
   h1 {
-    font-size: 2.12rem;
+    font-size: 1.91rem;
   }
 
   .teaser {
