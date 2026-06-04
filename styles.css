@@ -300,6 +300,10 @@ h1 {
   margin-bottom: 18px;
 }
 
+.video-controls.compact-control {
+  margin-bottom: 0;
+}
+
 .video-label {
   color: var(--ink);
   font-size: 1.18rem;
@@ -344,10 +348,10 @@ h1 {
   background: rgba(255, 255, 255, 0.86);
   color: var(--muted);
   font-family: inherit;
-  font-size: 1.18rem;
+  font-size: 1.25rem;
   font-weight: 500;
   line-height: 1;
-  padding: 10px 17px;
+  padding: 11px 20px;
   cursor: pointer;
   transition:
     background 160ms ease,
@@ -371,6 +375,11 @@ h1 {
 .task-tab:focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 3px;
+}
+
+.world-model-controls .compact-control:nth-child(2) .task-tab {
+  font-size: 1.09rem;
+  padding: 10px 17px;
 }
 
 .video-figure video {
@@ -444,6 +453,22 @@ h1 {
   margin: 0 auto;
 }
 
+.world-model-eval-videos {
+  margin-top: 30px;
+}
+
+.world-model-controls {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.world-model-video-figure {
+  max-width: none;
+  width: 75%;
+  margin: 0 auto;
+}
+
 .policy-finetuning-panel {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.7fr);
@@ -453,20 +478,6 @@ h1 {
 
 .policy-finetuning-video-figure {
   align-self: center;
-}
-
-.policy-finetuning-video-stack {
-  display: grid;
-  flex: 1 1 auto;
-  gap: 0;
-}
-
-.policy-finetuning-video-stack video:first-child {
-  border-radius: 8px 8px 0 0;
-}
-
-.policy-finetuning-video-stack video:last-child {
-  border-radius: 0 0 8px 8px;
 }
 
 .policy-finetuning-plot-figure {
@@ -495,43 +506,6 @@ h1 {
   align-self: center;
   justify-self: center;
   width: 100%;
-}
-
-.tts-video-stack {
-  display: grid;
-  flex: 1 1 auto;
-  gap: 0;
-}
-
-.tts-crop {
-  position: relative;
-  aspect-ratio: 32 / 9;
-  overflow: hidden;
-  background: #000;
-}
-
-.tts-crop:first-child {
-  border-radius: 8px 8px 0 0;
-}
-
-.tts-crop:last-child {
-  border-radius: 0 0 8px 8px;
-}
-
-.tts-crop video {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 200%;
-  border-radius: 0;
-}
-
-.tts-crop-top video {
-  top: 0;
-}
-
-.tts-crop-bottom video {
-  bottom: 0;
 }
 
 .tts-plot-figure {
@@ -1129,6 +1103,10 @@ pre code {
   }
 
   .tts-video-figure {
+    width: 100%;
+  }
+
+  .world-model-video-figure {
     width: 100%;
   }
 
