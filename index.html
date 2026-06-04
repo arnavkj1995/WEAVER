@@ -35,13 +35,13 @@
           <sup>4</sup>McGill University
         </p>
         <div class="link-row" aria-label="Project links">
-          <a class="project-link disabled" href="#paper" aria-disabled="true">
+          <a class="project-link disabled" href="#" aria-disabled="true">
             <span class="icon" aria-hidden="true">
               <img src="assets/icons/arxiv.svg" alt="" />
             </span>
             arXiv
           </a>
-          <a class="project-link disabled" href="#paper" aria-disabled="true">
+          <a class="project-link disabled" href="#" aria-disabled="true">
             <span class="icon" aria-hidden="true">
               <img src="assets/icons/file-pdf.svg" alt="" />
             </span>
@@ -57,7 +57,7 @@
             </span>
             Code
           </a>
-          <a class="project-link disabled" href="#data" aria-disabled="true">
+          <a class="project-link disabled" href="#" aria-disabled="true">
             <span class="icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <ellipse cx="12" cy="5" rx="7" ry="3" />
@@ -206,7 +206,7 @@
         </figure>
       </section>
 
-      <section class="section result-section">
+      <section class="section result-section latent-verifier-section">
         <h3 class="subsection-title">Latent Verifier and Planning</h3>
         <p class="section-lede">
           <code>WEAVER</code>'s latent reward is trained to match RoboMeter's task progress rewards. 
@@ -253,8 +253,19 @@
 
           <div class="video-block" id="policy-eval-videos">
             <div class="video-controls">
-              <label class="video-label" for="policy-eval-task">Task</label>
-              <select id="policy-eval-task" class="task-select">
+              <span class="video-label sr-only" id="policy-eval-task-label">Policy evaluation task</span>
+              <div
+                class="task-tabs"
+                role="tablist"
+                aria-labelledby="policy-eval-task-label"
+              >
+                <button class="task-tab active" type="button" data-task="marker" role="tab">PnP Marker</button>
+                <button class="task-tab" type="button" data-task="pour" role="tab">Pour Beans</button>
+                <button class="task-tab" type="button" data-task="towel" role="tab">PnP Towel</button>
+                <button class="task-tab" type="button" data-task="stack" role="tab">Stack Bowls</button>
+                <button class="task-tab" type="button" data-task="bag" role="tab">PnP Bag</button>
+              </div>
+              <select id="policy-eval-task" class="task-select task-select-hidden" aria-hidden="true" tabindex="-1">
                 <option value="marker">PnP Marker</option>
                 <option value="pour">Pour Beans</option>
                 <option value="towel">PnP Towel</option>
@@ -262,62 +273,18 @@
                 <option value="bag">PnP Bag</option>
               </select>
             </div>
-            <div class="video-grid">
-              <figure class="paper-figure video-figure">
-                <div class="video-wrap gt-pred">
-                  <div class="row-labels">
-                    <span class="row-label">GT</span>
-                    <span class="row-label">Pred</span>
-                  </div>
-                  <video
-                    class="policy-eval-video"
-                    data-method="ctrl_world"
-                    src="assets/videos/policy_eval/marker_ctrl_world.mp4"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                  ></video>
-                </div>
-                <figcaption>Ctrl-World</figcaption>
-              </figure>
-              <figure class="paper-figure video-figure">
-                <div class="video-wrap gt-pred">
-                  <div class="row-labels">
-                    <span class="row-label">GT</span>
-                    <span class="row-label">Pred</span>
-                  </div>
-                  <video
-                    class="policy-eval-video"
-                    data-method="ours"
-                    src="assets/videos/policy_eval/marker_ours.mp4"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                  ></video>
-                </div>
-                <figcaption>Ours</figcaption>
-              </figure>
-              <figure class="paper-figure video-figure">
-                <div class="video-wrap gt-pred">
-                  <div class="row-labels">
-                    <span class="row-label">GT</span>
-                    <span class="row-label">Pred</span>
-                  </div>
-                  <video
-                    class="policy-eval-video"
-                    data-method="ours_ft"
-                    src="assets/videos/policy_eval/marker_ours_ft.mp4"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                  ></video>
-                </div>
-                <figcaption>Ours-FT</figcaption>
-              </figure>
-            </div>
+            <figure class="paper-figure video-figure policy-eval-comparison-figure">
+              <div class="video-wrap gt-pred">
+                <video
+                  id="policy-eval-comparison-video"
+                  src="assets/videos/policy_eval/marker_eval_compare_2cams_aligned5fps_transposed.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                ></video>
+              </div>
+            </figure>
           </div>
         </div>
 
@@ -334,19 +301,29 @@
           <figure class="paper-figure medium-figure">
             <img
               src="assets/task_success_rate_mean.png"
-              alt="Policy improvement success rates across tasks."
+              alt="Policy finetuning success rates across tasks."
             />
             <figcaption>
-              <strong>Policy improvement with finetuning.</strong> Finetuning
-              pi_0.5 with real and synthetic data generated by
+              <strong>Policy finetuning.</strong> Finetuning
+              &pi;<sub>0.5</sub> with real and synthetic data generated by
               <code>WEAVER</code> yields the strongest success rates.
             </figcaption>
           </figure>
-
           <div class="video-block" id="policy-improvement-videos">
             <div class="video-controls">
-              <label class="video-label" for="policy-improvement-task">Task</label>
-              <select id="policy-improvement-task" class="task-select">
+              <span class="video-label sr-only" id="policy-improvement-task-label">Policy finetuning task</span>
+              <div
+                class="task-tabs"
+                role="tablist"
+                aria-labelledby="policy-improvement-task-label"
+              >
+                <button class="task-tab active" type="button" data-task="marker" role="tab">PnP Marker</button>
+                <button class="task-tab" type="button" data-task="pour" role="tab">Pour Beans</button>
+                <button class="task-tab" type="button" data-task="towel" role="tab">PnP Towel</button>
+                <button class="task-tab" type="button" data-task="stack" role="tab">Stack Bowls</button>
+                <button class="task-tab" type="button" data-task="bag" role="tab">PnP Bag</button>
+              </div>
+              <select id="policy-improvement-task" class="task-select task-select-hidden" aria-hidden="true" tabindex="-1">
                 <option value="marker">PnP Marker</option>
                 <option value="pour">Pour Beans</option>
                 <option value="towel">PnP Towel</option>
@@ -354,30 +331,39 @@
                 <option value="bag">PnP Bag</option>
               </select>
             </div>
-            <div class="video-grid two-col">
-              <figure class="paper-figure video-figure">
-                <video
-                  class="policy-improvement-video"
-                  data-method="base_policy"
-                  src="assets/videos/policy_improvement/marker_base_policy.mp4"
-                  autoplay
-                  muted
-                  loop
-                  playsinline
-                ></video>
-                <figcaption>&pi;<sub>0.5</sub> (Base Policy)</figcaption>
+            <div class="policy-finetuning-panel">
+              <figure class="paper-figure video-figure policy-finetuning-video-figure">
+                <div class="video-wrap">
+                  <div class="row-labels">
+                    <span class="row-label"><span class="pi-symbol">&pi;</span><sub>0.5</sub></span>
+                    <span class="row-label">Ours (FT)</span>
+                  </div>
+                  <div class="policy-finetuning-video-stack">
+                    <video
+                      id="policy-finetuning-base-video"
+                      src="assets/videos/policy_improvement/marker_base_policy_2views.mp4"
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                    ></video>
+                    <video
+                      id="policy-finetuning-ours-video"
+                      src="assets/videos/policy_improvement/marker_ours_2views.mp4"
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                    ></video>
+                  </div>
+                </div>
               </figure>
-              <figure class="paper-figure video-figure">
-                <video
-                  class="policy-improvement-video"
-                  data-method="ours"
-                  src="assets/videos/policy_improvement/marker_ours.mp4"
-                  autoplay
-                  muted
-                  loop
-                  playsinline
-                ></video>
-                <figcaption>Ours (Mixed-Data Finetuning)</figcaption>
+              <figure class="paper-figure policy-finetuning-plot-figure">
+                <img
+                  id="policy-finetuning-plot"
+                  src="assets/policy_finetuning/task_success_rate_pnp_marker.png"
+                  alt="Policy finetuning success rates for the selected task."
+                />
               </figure>
             </div>
           </div>
@@ -393,22 +379,21 @@
             and latent reward scoring make this practical without external VLM
             judging.
           </p>
-          <figure class="paper-figure small-figure">
-            <img
-              src="assets/task_success_rate_mean_tts.png"
-              alt="Test-time planning success rates across tasks."
-            />
-            <figcaption>
-              <strong>Test-time steering.</strong> Advantage-based action
-              selection improves task success over the base policy across
-              real-world trials.
-            </figcaption>
-          </figure>
-
           <div class="tts-panel" id="tts-panel">
             <div class="video-controls">
-              <label class="video-label" for="tts-task">Task</label>
-              <select id="tts-task" class="task-select">
+              <span class="video-label sr-only" id="tts-task-label">Test-time steering task</span>
+              <div
+                class="task-tabs"
+                role="tablist"
+                aria-labelledby="tts-task-label"
+              >
+                <button class="task-tab active" type="button" data-task="marker" role="tab">PnP Marker</button>
+                <button class="task-tab" type="button" data-task="pour" role="tab">Pour Beans</button>
+                <button class="task-tab" type="button" data-task="towel" role="tab">PnP Towel</button>
+                <button class="task-tab" type="button" data-task="stack" role="tab">Stack Bowls</button>
+                <button class="task-tab" type="button" data-task="bag" role="tab">PnP Bag</button>
+              </div>
+              <select id="tts-task" class="task-select task-select-hidden" aria-hidden="true" tabindex="-1">
                 <option value="marker">PnP Marker</option>
                 <option value="pour">Pour Beans</option>
                 <option value="towel">PnP Towel</option>
@@ -416,23 +401,45 @@
                 <option value="bag">PnP Bag</option>
               </select>
             </div>
-            <figure class="paper-figure video-figure tts-video-figure">
-              <div class="video-wrap gt-pred">
-                <div class="row-labels">
-                  <span class="row-label">GT</span>
-                  <span class="row-label">Pred</span>
+            <div class="tts-overview-panel">
+              <figure class="paper-figure video-figure tts-video-figure">
+                <div class="video-wrap gt-pred">
+                  <div class="row-labels">
+                    <span class="row-label">Real</span>
+                    <span class="row-label">Imagined</span>
+                  </div>
+                  <div class="tts-video-stack">
+                    <div class="tts-crop tts-crop-top">
+                      <video
+                        class="tts-video"
+                        src="assets/videos/tts_steering/marker/combined_2views.mp4"
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                      ></video>
+                    </div>
+                    <div class="tts-crop tts-crop-bottom">
+                      <video
+                        class="tts-video"
+                        src="assets/videos/tts_steering/marker/combined_2views.mp4"
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                      ></video>
+                    </div>
+                  </div>
                 </div>
-                <video
-                  id="tts-video"
-                  src="assets/videos/tts_steering/marker/combined.mp4"
-                  autoplay
-                  muted
-                  loop
-                  playsinline
-                ></video>
-              </div>
-              <figcaption>Executed Trajectory After Steering &pi;<sub>0.5</sub> at Test-Time</figcaption>
-            </figure>
+              </figure>
+              <figure class="paper-figure tts-plot-figure">
+                <img
+                  id="tts-plot"
+                  src="assets/tts_steering/task_success_rate_tts_pnp_marker.png"
+                  alt="Test-time steering success rates for the selected task."
+                />
+              </figure>
+            </div>
 
             <div class="tts-slider-row">
               <span class="tts-slider-label">Chunk</span>
@@ -448,22 +455,11 @@
               <output id="tts-slider-value" class="tts-slider-value">1</output>
             </div>
 
-            <p class="tts-chunk-heading">
-              Last predicted frame in chunk
-              <span id="tts-chunk-index">1</span> /
-              <span id="tts-chunk-total">18</span> (chunk size = 15)
-            </p>
             <figure class="paper-figure video-figure tts-chunk-figure">
               <div class="tts-chunk-wrap">
-                <div class="sample-labels">
-                  <span class="sample-label">Sample 1</span>
-                  <span class="sample-label">Sample 2</span>
-                  <span class="sample-label">Sample 3</span>
-                  <span class="sample-label">Sample 4</span>
-                </div>
                 <img
                   id="tts-chunk-image"
-                  src="assets/videos/tts_steering/marker/chunk_001.png"
+                  src="assets/videos/tts_steering/marker/chunk_001_transposed.png"
                   alt="Per-chunk last-frame predictions with advantage values."
                 />
               </div>
@@ -474,26 +470,6 @@
             </figure>
           </div>
         </div>
-      </section>
-
-      <section id="code" class="section resources">
-        <article id="paper">
-          <h2>Paper</h2>
-          <p>Paper and arXiv links will be added when public.</p>
-        </article>
-        <article>
-          <h2>Code</h2>
-          <p>
-            The implementation is available at
-            <a href="https://github.com/arnavkj1995/WEAVER" rel="noreferrer">
-              github.com/arnavkj1995/WEAVER</a
-            >.
-          </p>
-        </article>
-        <article id="data">
-          <h2>Data</h2>
-          <p>Dataset, checkpoints, and evaluation artifacts will be linked here.</p>
-        </article>
       </section>
 
       <section id="bibtex" class="section narrow">
@@ -530,16 +506,64 @@
       window.addEventListener("scroll", updateScrollProgress, { passive: true });
       window.addEventListener("resize", updateScrollProgress);
 
+      function bindTaskTabs(select) {
+        const controls = select.closest(".video-controls");
+        const tabs = controls ? controls.querySelectorAll(".task-tab") : [];
+        if (!tabs.length) return;
+
+        function syncTabs() {
+          tabs.forEach((tab) => {
+            const isActive = tab.dataset.task === select.value;
+            tab.classList.toggle("active", isActive);
+            tab.setAttribute("aria-selected", isActive ? "true" : "false");
+            tab.tabIndex = isActive ? 0 : -1;
+          });
+        }
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            if (select.value === tab.dataset.task) return;
+            select.value = tab.dataset.task;
+            syncTabs();
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+          tab.addEventListener("keydown", (event) => {
+            if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+              return;
+            }
+            event.preventDefault();
+            const currentIndex = Array.from(tabs).indexOf(tab);
+            let nextIndex = currentIndex;
+            if (event.key === "ArrowLeft") {
+              nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+            } else if (event.key === "ArrowRight") {
+              nextIndex = (currentIndex + 1) % tabs.length;
+            } else if (event.key === "Home") {
+              nextIndex = 0;
+            } else if (event.key === "End") {
+              nextIndex = tabs.length - 1;
+            }
+            tabs[nextIndex].focus();
+            tabs[nextIndex].click();
+          });
+        });
+
+        select.addEventListener("change", syncTabs);
+        syncTabs();
+      }
+
+      document.querySelectorAll(".task-select").forEach(bindTaskTabs);
+
       const policyEvalTask = document.querySelector("#policy-eval-task");
       if (policyEvalTask) {
-        const policyEvalVideos = document.querySelectorAll(".policy-eval-video");
+        const policyEvalVideo = document.querySelector("#policy-eval-comparison-video");
         policyEvalTask.addEventListener("change", (event) => {
           const task = event.target.value;
-          policyEvalVideos.forEach((video) => {
-            video.src = `assets/videos/policy_eval/${task}_${video.dataset.method}.mp4`;
-            video.load();
-            video.play().catch(() => {});
-          });
+          if (policyEvalVideo) {
+            policyEvalVideo.src = `assets/videos/policy_eval/${task}_eval_compare_2cams_aligned5fps_transposed.mp4`;
+            policyEvalVideo.load();
+            policyEvalVideo.play().catch(() => {});
+          }
         });
       }
 
@@ -547,16 +571,37 @@
         "#policy-improvement-task",
       );
       if (policyImprovementTask) {
-        const policyImprovementVideos = document.querySelectorAll(
-          ".policy-improvement-video",
+        const policyFinetuningBaseVideo = document.querySelector(
+          "#policy-finetuning-base-video",
         );
+        const policyFinetuningOursVideo = document.querySelector(
+          "#policy-finetuning-ours-video",
+        );
+        const policyFinetuningPlot = document.querySelector(
+          "#policy-finetuning-plot",
+        );
+        const policyFinetuningPlots = {
+          marker: "task_success_rate_pnp_marker.png",
+          pour: "task_success_rate_pour_beans.png",
+          towel: "task_success_rate_pnp_towel.png",
+          stack: "task_success_rate_stack_bowls.png",
+          bag: "task_success_rate_pnp_bag.png",
+        };
         policyImprovementTask.addEventListener("change", (event) => {
           const task = event.target.value;
-          policyImprovementVideos.forEach((video) => {
-            video.src = `assets/videos/policy_improvement/${task}_${video.dataset.method}.mp4`;
-            video.load();
-            video.play().catch(() => {});
-          });
+          if (policyFinetuningBaseVideo) {
+            policyFinetuningBaseVideo.src = `assets/videos/policy_improvement/${task}_base_policy_2views.mp4`;
+            policyFinetuningBaseVideo.load();
+            policyFinetuningBaseVideo.play().catch(() => {});
+          }
+          if (policyFinetuningOursVideo) {
+            policyFinetuningOursVideo.src = `assets/videos/policy_improvement/${task}_ours_2views.mp4`;
+            policyFinetuningOursVideo.load();
+            policyFinetuningOursVideo.play().catch(() => {});
+          }
+          if (policyFinetuningPlot) {
+            policyFinetuningPlot.src = `assets/policy_finetuning/${policyFinetuningPlots[task]}`;
+          }
         });
       }
 
@@ -570,29 +615,38 @@
           bag: 17,
         };
         const ttsTask = ttsPanel.querySelector("#tts-task");
-        const ttsVideo = ttsPanel.querySelector("#tts-video");
+        const ttsVideos = ttsPanel.querySelectorAll(".tts-video");
+        const ttsPlot = ttsPanel.querySelector("#tts-plot");
         const ttsImage = ttsPanel.querySelector("#tts-chunk-image");
         const ttsSlider = ttsPanel.querySelector("#tts-slider");
         const ttsSliderValue = ttsPanel.querySelector("#tts-slider-value");
-        const ttsChunkIndex = ttsPanel.querySelector("#tts-chunk-index");
-        const ttsChunkTotal = ttsPanel.querySelector("#tts-chunk-total");
 
         const pad3 = (n) => String(n).padStart(3, "0");
+        const TTS_PLOTS = {
+          marker: "task_success_rate_tts_pnp_marker.png",
+          pour: "task_success_rate_tts_pour_beans.png",
+          towel: "task_success_rate_tts_pnp_towel.png",
+          stack: "task_success_rate_tts_stack_bowls.png",
+          bag: "task_success_rate_tts_pnp_bag.png",
+        };
 
         function showChunk(task, index) {
-          ttsImage.src = `assets/videos/tts_steering/${task}/chunk_${pad3(index)}.png`;
+          ttsImage.src = `assets/videos/tts_steering/${task}/chunk_${pad3(index)}_transposed.png`;
           ttsSliderValue.value = index;
-          ttsChunkIndex.textContent = index;
         }
 
         function selectTask(task) {
           const total = TTS_CHUNK_COUNTS[task];
           ttsSlider.max = total;
           ttsSlider.value = 1;
-          ttsChunkTotal.textContent = total;
-          ttsVideo.src = `assets/videos/tts_steering/${task}/combined.mp4`;
-          ttsVideo.load();
-          ttsVideo.play().catch(() => {});
+          ttsVideos.forEach((video) => {
+            video.src = `assets/videos/tts_steering/${task}/combined_2views.mp4`;
+            video.load();
+            video.play().catch(() => {});
+          });
+          if (ttsPlot) {
+            ttsPlot.src = `assets/tts_steering/${TTS_PLOTS[task]}`;
+          }
           showChunk(task, 1);
         }
 
