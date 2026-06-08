@@ -99,6 +99,9 @@ cmd=(
   --val-chunk "$NUM_CHUNKS"
   --val-chunk-id "$CHUNK_ID"
 )
+if [[ -n "${CONFIG:-}" ]]; then
+  cmd+=(--config "$CONFIG")
+fi
 if [[ "$USE_REAL_HISTORY" == "1" ]]; then
   cmd+=(--use-real-history)
 fi

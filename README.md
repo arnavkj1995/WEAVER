@@ -4,59 +4,20 @@
 
 <!-- TODO: add paper, arXiv, project website, pretrained checkpoints, and dataset links when public. -->
 
-[![License](https://img.shields.io/badge/License-TBD-lightgrey?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c?style=for-the-badge&logo=pytorch)](https://pytorch.org/)
+[![Website](https://img.shields.io/badge/Website-WEAVER-black?style=for-the-badge)](https://arnavkj1995.github.io/WEAVER/)
 
 ---
 
-## Overview
+We introduce WEAVER: a world model architecture that satisfies the three desiderata: (i) fidelity, (ii) consistency, and (iii) efficiency. WEAVER unlocks state-of-the-art performance across policy evaluation (ρ = 0.870 correlation with real-world success rate), policy improvement (real-world success rate improvement of 38% on top of the π0.5 robot foundation model), and test-time planning (real-world success rate improvement of 14% with a 5–10× speedup over prior WMs).
 
-This repository contains the world-model code for **WEAVER**, a two-camera latent flow model for DROID-style robot rollouts. WEAVER predicts future latent observations conditioned on image latents, robot states, actions, language/task features, and optional sparse memory frames.
+![WEAVER architecture](assets/readme/weaver-architecture.png)
 
-The codebase includes:
+## 🛠️ Setup
 
-- Latent flow world model with image, state, action, and text conditioning.
-- DROID-style dataloaders with precomputed latent support.
-- Reward-model and critic heads for auxiliary world-model training.
-- Diffusion-forcing rollouts with linear, cosine, power, and sigmoid inference schedules.
-- KV-cache accelerated generation for faster evaluation.
-- Offline FID, FVD, LPIPS, PSNR, and SSIM computation from saved view arrays.
-
-The repository is intentionally scoped to the world-model stack. Policy learning, plotting artifacts, and experiment-specific analysis scripts are not part of the core package.
-
----
-
-## Repository Structure
-
-The main package lives in [`weaver/`](./weaver).
-
-### Key paths
-
-- **World model code:** [`weaver/wm/`](./weaver/wm/)  
-  Encoders, decoders, transformer blocks, flow model, and KV-cache support.
-
-- **Dataset loading:** [`weaver/datasets/`](./weaver/datasets/)  
-  Runtime dataloaders for preprocessed DROID-style trajectories.
-
-- **Preprocessing utilities:** [`datasets/preprocess_droid.py`](./datasets/preprocess_droid.py)  
-  Offline helpers for normalization stats, video conversion, text features, and SD3 latent encoding.
-
-- **Pretraining entry:** [`weaver/pretrain.py`](./weaver/pretrain.py)
-
-- **Finetuning entry:** [`weaver/finetune.py`](./weaver/finetune.py)
-
-- **Video generation entry:** [`weaver/generate_views.py`](./weaver/generate_views.py)
-
-- **Offline metric script:** [`scripts/compute_metrics.py`](./scripts/compute_metrics.py)
-
-- **Default config:** [`weaver/config.yaml`](./weaver/config.yaml)
-
----
-
-## Installation
-
-Create the environment with `uv`:
+Create a Python 3.11 environment and install dependencies with `uv`.
 
 ```bash
 git clone <repo-url> WEAVER
@@ -66,25 +27,46 @@ source .venv/bin/activate
 uv sync
 ```
 
+For optional logging and development dependencies:
+
+```bash
+uv sync --extra logging --extra dev
+```
+
 You can also run commands directly through `uv`:
 
 ```bash
 uv run python -m weaver.generate_views --help
 ```
 
----
+## 📁 Repository Structure
 
-## Training WEAVER
+This repository implements the main WEAVER components: the latent flow world model, DROID dataloaders, reward and critic heads, rollout generation, and offline evaluation utilities.
 
-WEAVER expects preprocessed DROID-style data containing annotations, actions/states, view videos or precomputed view latents, text features, rewards, and normalization statistics. The data root is configured with:
-
-```bash
-dataset.path=/path/to/preprocessed_droid
+```text
+WEAVER
+├── assets                           # README and release assets
+├── datasets                         # DROID preprocessing and SD3 latent encoding utilities
+├── scripts                          # Slurm launchers and offline evaluation scripts
+├── weaver                           # Core WEAVER package and training/generation entrypoints
+│   ├── datasets                     # Runtime DROID-style dataloaders
+│   ├── utils                        # Config, checkpointing, evaluation, and metric utilities
+│   └── wm                           # Latent flow world model, encoders, decoders, and transformer blocks
+├── pyproject.toml                   # Package metadata and dependencies
+└── README.md
 ```
 
-### Pretraining
+## 🚀 Training WEAVER
 
-Pretrain a WEAVER world model from scratch:
+WEAVER expects preprocessed DROID-style trajectories with actions, states, language features, rewards, normalization statistics, and either view videos or precomputed SD3 latents.
+
+Encode SD3 latents for a dataset root:
+
+```bash
+python datasets/preprocess_droid.py --data_root /path/to/preprocessed_droid
+```
+
+Pretrain from scratch:
 
 ```bash
 python -m weaver.pretrain \
@@ -93,34 +75,7 @@ python -m weaver.pretrain \
   scratch_dir=/path/to/output/model_dir
 ```
 
-Common overrides:
-
-```bash
-training.batch_size=8
-training.max_steps=1000000
-model.val_steps=16
-model.diff_forcing=True
-inference.pyramid_schedule=cosine
-inference.pyramid_stagger_width=1
-```
-
-Checkpoints are written to:
-
-```text
-<scratch_dir>/logs/chkpts/checkpoint.pt
-```
-
-Slurm entrypoint:
-
-```bash
-DATASET_PATH=/path/to/preprocessed_droid \
-SCRATCH_DIR=/path/to/output/model_dir \
-sbatch scripts/pretrain.sh
-```
-
-### Finetuning
-
-Finetune from a pretrained checkpoint directory:
+Finetune from a checkpoint:
 
 ```bash
 python -m weaver.finetune \
@@ -130,45 +85,34 @@ python -m weaver.finetune \
   dataset.path=/path/to/finetune_data
 ```
 
-Finetuned checkpoints are written to:
-
-```text
-<scratch_dir>/logs/chkpts_<finetune_suffix>/checkpoint.pt
-```
-
-Plain launcher for local runs or an already allocated node:
+Run ReFlow post-training to distill a multi-step teacher into a faster student rollout:
 
 ```bash
-PRETRAINED_DIR=/path/to/pretrained/logs/chkpts \
-DATASET_PATH=/path/to/finetune_data \
-FINETUNE_SUFFIX=finetune \
-bash scripts/finetune.sh
+python -m weaver.reflow \
+  --config weaver/config.yaml \
+  --pretrained_dir /path/to/teacher/logs/chkpts \
+  --pretrained_ckpt_name checkpoint.pt \
+  --finetune_suffix reflow \
+  dataset.path=/path/to/preprocessed_droid \
+  training.max_steps=4000 \
+  model.rectified_teacher_steps=50 \
+  model.val_steps=4
 ```
 
-For multi-GPU Slurm runs, submit the dedicated Slurm wrapper:
+Slurm launchers for training workflows are available in [`scripts/`](./scripts/).
 
-```bash
-PRETRAINED_DIR=/path/to/pretrained/logs/chkpts \
-DATASET_PATH=/path/to/finetune_data \
-EXP_NAME=weaver_finetune \
-FINETUNE_SUFFIX=finetune \
-sbatch scripts/finetune_h100_ddp.sh
-```
+## 🔮 Inference
 
-### Evaluation
+### Basic Inference
 
-Generate rollout views and videos from a checkpoint:
+Generate rollout views and videos:
 
 ```bash
 python -m weaver.generate_views \
   --checkpoint /path/to/logs/chkpts \
   --output-dir /path/to/eval_output \
   --split val \
-  --num-samples 120 \
-  --num-videos 8 \
-  --start-idx 20 \
   --use-real-history \
-  --use-ema \
   --overrides \
     dataset.path=/path/to/eval_dataset \
     model.val_steps=27 \
@@ -178,76 +122,14 @@ python -m weaver.generate_views \
     inference.pyramid_schedule=cosine
 ```
 
-This writes view arrays and optional MP4 previews:
-
-```text
-<output-dir>/views/<traj_id>/pred_view0.npy
-<output-dir>/views/<traj_id>/pred_view1.npy
-<output-dir>/videos/eval_sample_<traj_id>.mp4
-```
-
-Compute offline metrics from saved views:
-
-```bash
-python scripts/compute_metrics.py \
-  --gt_views_dir /path/to/shared_gt/views \
-  --pred_views_dir /path/to/eval_output/views \
-  --cameras view0 view1 \
-  --start_frame 0 \
-  --num_frames 50 \
-  --fvd_sliding_window \
-  --fvd_window 16 \
-  --fvd_stride 8 \
-  --pad_short_clips \
-  --output metrics.json
-```
-
-For OOD splits with held-out trajectory IDs:
-
-```bash
-python scripts/compute_metrics.py \
-  --gt_views_dir /path/to/shared_gt/views \
-  --pred_views_dir /path/to/eval_output/views \
-  --cameras view0 view1 \
-  --start_frame 0 \
-  --num_frames 50 \
-  --exclude_traj_ids 60-79 \
-  --fvd_sliding_window \
-  --fvd_window 16 \
-  --fvd_stride 8 \
-  --pad_short_clips \
-  --output metrics_ood.json
-```
-
-Example Slurm scripts are available under [`scripts/`](./scripts/), including generation and metric jobs for common real-history evaluation settings.
-
-The default evaluation script covers DROID val and OOD real-history generation:
-
-```bash
-CHECKPOINT=/path/to/logs/chkpts \
-DATASET=droid_val \
-VAL_STEPS=27 EVAL_HORIZON=5 STAGGER_WIDTH=1 SCHEDULE=cosine \
-sbatch --array=0-3 scripts/evaluate_wm.sh
-```
-
----
-
-## Inference Schedules
-
-WEAVER supports several rollout schedules:
-
-```bash
-inference.pyramid_schedule=linear
-inference.pyramid_schedule=cosine
-inference.pyramid_schedule=power
-inference.pyramid_schedule=sigmoid
-```
+### ⏱️ Inference Schedules
 
 The main inference controls are:
 
 - `model.val_steps`: number of flow denoising steps.
 - `eval_horizon`: number of future frames generated per chunk.
 - `eval_bootstrap`: number of generated frames fed back before the next chunk.
+- `inference.pyramid_schedule`: denoising schedule used during rollout (`linear`, `cosine`, `power`, `sigmoid`).
 - `inference.pyramid_stagger_width`: offset between frame-wise denoising schedules.
 
 For staggered inference, the effective number of function evaluations is:
@@ -266,9 +148,25 @@ model.val_steps=8 eval_horizon=5 inference.pyramid_stagger_width=0
 model.val_steps=45 eval_horizon=5 inference.pyramid_stagger_width=1
 ```
 
+Slurm launchers for generation workflows are available in [`scripts/`](./scripts/).
+
+## 📊 World Model Evaluation
+
+Compute FID, FVD, LPIPS, PSNR, and SSIM from saved views:
+
+```bash
+python scripts/compute_metrics.py \
+  --gt_views_dir /path/to/shared_gt/views \
+  --pred_views_dir /path/to/eval_output/views \
+  --cameras wrist exterior_1_left \
+  --output metrics.json
+```
+
+Slurm launchers for evaluation workflows are available in [`scripts/`](./scripts/).
+
 ---
 
-## Citation
+## 📚 Citation
 
 If you use WEAVER, please cite the corresponding paper once available.
 
@@ -282,6 +180,6 @@ If you use WEAVER, please cite the corresponding paper once available.
 
 ---
 
-## Acknowledgements
+## 🙏 Acknowledgements
 
 This codebase builds on ideas and infrastructure from latent diffusion and flow matching, Dreamer-style world models, DROID robot datasets, and the original SAILOR world-model codebase.
