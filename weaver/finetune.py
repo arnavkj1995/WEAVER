@@ -334,7 +334,6 @@ def main():
                     tasks=data["task"],
                     gt_rewards=data["rewards"],
                     memory=data.get("memory", None),
-                    update_rm=bool(step % cfg.model.rm_update_freq),
                 )
             total_loss = total_loss / cfg.training.gradient_accumulation_steps
             loss_accum += total_loss.detach()

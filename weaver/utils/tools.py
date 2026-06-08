@@ -126,7 +126,9 @@ def save_checkpoint(
     optimizer: torch.optim.Optimizer,
     cfg: Dict,
     step: int,
-    suffix: str = ''
+    suffix: str = '',
+    save_config: bool = True,
+    atomic: bool = True,
 ):
     """Save checkpoint to a single checkpoint.pt file (atomic overwrite)."""
     print (f'Saving model at step: {step} at {chkpt_dir}')
@@ -137,12 +139,16 @@ def save_checkpoint(
         "step": step,
     }
     ckpt_path = os.path.join(chkpt_dir, f'checkpoint{suffix}.pt')
-    tmp_path = ckpt_path + '.tmp'
-    torch.save(state, tmp_path)
-    os.replace(tmp_path, ckpt_path)
+    if atomic:
+        tmp_path = ckpt_path + '.tmp'
+        torch.save(state, tmp_path)
+        os.replace(tmp_path, ckpt_path)
+    else:
+        torch.save(state, ckpt_path)
 
-    with open(os.path.join(chkpt_dir, 'config.yaml'), 'w') as f:
-        yaml.safe_dump(namespace_to_dict(cfg), f, sort_keys=False)
+    if save_config:
+        with open(os.path.join(chkpt_dir, 'config.yaml'), 'w') as f:
+            yaml.safe_dump(namespace_to_dict(cfg), f, sort_keys=False)
 
 
 def load_checkpoint(
@@ -226,6 +232,8 @@ def get_lr(
 
     # 3) In between use cosine decay to min_lr
     decay_steps = max_steps - warmup_steps
+    if decay_steps <= 0:
+        return min_lr
     decay_ratio = (it - warmup_steps) / decay_steps
     assert 0 <= decay_ratio <= 1
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))  # coeff ranges 1..0

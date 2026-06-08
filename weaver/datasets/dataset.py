@@ -102,7 +102,9 @@ def create_dataset(
         fixed_t=fixed_t,
         use_fixed_id=use_fixed_id,
         eval_mode=eval_mode,
-        annotation_dir=cfg.annotation_dir if hasattr(cfg, 'annotation_dir') else 'annotation_rewards',
+        reward_key=cfg.reward_key if hasattr(cfg, 'reward_key') else 'reward_progress',
+        negative_reward=cfg.negative_reward if hasattr(cfg, 'negative_reward') else True,
+        annotation_dir=cfg.annotation_dir if hasattr(cfg, 'annotation_dir') else 'annotations',
         collapse_prob=cfg.collapse_prob if hasattr(cfg, 'collapse_prob') else 0.1,
     )
 

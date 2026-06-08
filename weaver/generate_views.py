@@ -24,9 +24,9 @@ from .wm.encoders import get_encoder, get_task_encoder
 from .wm.model import WEAVER
 
 
-def load_eval_config(checkpoint_dir: str, overrides: list[str]):
+def load_eval_config(checkpoint_dir: str, overrides: list[str], config_path: str | None = None):
     default_cfg = load_config(Path(__file__).with_name("config.yaml"), mode="defaults")
-    config_path = Path(checkpoint_dir) / "config.yaml"
+    config_path = Path(config_path) if config_path else Path(checkpoint_dir) / "config.yaml"
     if not config_path.exists():
         raise FileNotFoundError(f"Config not found: {config_path}")
 
@@ -283,6 +283,13 @@ def generate_and_save(model, cfg, img_keys, args, device: str):
             traj_dir = views_dir / str(traj_id)
             traj_dir.mkdir(parents=True, exist_ok=True)
             for vi, key in enumerate(img_keys):
+                gt_view = gt_views[key][:t_out]
+                if len(gt_view) != len(pred_views[key]):
+                    raise ValueError(
+                        f"GT/prediction length mismatch for trajectory {traj_id}, "
+                        f"{key}: {len(gt_view)} != {len(pred_views[key])}"
+                    )
+                np.save(traj_dir / f"gt_view{vi}.npy", gt_view)
                 np.save(traj_dir / f"pred_view{vi}.npy", pred_views[key])
 
             if saved_videos < args.num_videos:
@@ -306,13 +313,16 @@ def generate_and_save(model, cfg, img_keys, args, device: str):
 def parse_args():
     parser = argparse.ArgumentParser(description="Generate WEAVER saved views")
     parser.add_argument("--checkpoint", required=True)
+    parser.add_argument("--config", default=None)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--split", default="val", choices=["train", "val"])
     parser.add_argument("--num-samples", type=int, default=120)
-    parser.add_argument("--num-videos", type=int, default=4)
+    parser.add_argument("--num-videos", type=int, default=8)
     parser.add_argument("--start-idx", type=int, default=20)
     parser.add_argument("--use-real-history", action="store_true")
-    parser.add_argument("--use-ema", action="store_true")
+    parser.set_defaults(use_ema=True)
+    parser.add_argument("--use-ema", dest="use_ema", action="store_true")
+    parser.add_argument("--no-use-ema", dest="use_ema", action="store_false")
     parser.add_argument("--use-kv-cache", action="store_true")
     parser.add_argument("--val-chunk", type=int, default=1)
     parser.add_argument("--val-chunk-id", type=int, default=0)
@@ -327,7 +337,7 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    cfg = load_eval_config(checkpoint_dir, args.overrides)
+    cfg = load_eval_config(checkpoint_dir, args.overrides, args.config)
     print(f"Checkpoint: {checkpoint_dir}")
     print(f"Output: {output_dir}")
     print(f"Device: {device}")

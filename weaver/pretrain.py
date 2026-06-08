@@ -296,7 +296,6 @@ def main():
                     tasks=data['task'],
                     gt_rewards=data['rewards'],
                     memory=data.get('memory', None),
-                    update_rm=bool(step % cfg.model.rm_update_freq),
                 )
 
             total_loss = total_loss / gradient_accum_steps
@@ -347,7 +346,7 @@ def main():
                 wandb.log(wandb_log, step=step)
 
 
-        if step % cfg.valid_log_freq == 0:
+        if cfg.valid_log_freq > 0 and step % cfg.valid_log_freq == 0:
             wm.eval()
             raw_wm.eval()
             
@@ -389,7 +388,7 @@ def main():
                 step=step
             )
             
-        if step % cfg.video_log_freq == 0 and master_process:
+        if cfg.video_log_freq > 0 and step % cfg.video_log_freq == 0 and master_process:
             raw_wm.eval()  # Disable SPRINT token dropping for inference
             n_vids=4 # B is batch - size
 
