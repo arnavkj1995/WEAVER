@@ -191,6 +191,7 @@ class PrecomputedDroid(Dataset):
         img_keys: List[str] = ['exterior_1_left', 'exterior_2_left', 'wrist_left'],
         relabel_actions: bool = False,
         normalize: bool = True,
+        norm_stats_path: Optional[str] = None,
         cache_trajectories: bool = False,
         return_language: bool = True,
         max_trajectories: Optional[int] = None,
@@ -218,6 +219,8 @@ class PrecomputedDroid(Dataset):
             img_keys: Which camera views to use (0=exterior_1_left, 1=exterior_2_left, 2=wrist_left)
             relabel_actions: Whether to relabel actions (compute from state differences)
             normalize: Whether to normalize states and actions
+            norm_stats_path: Optional normalization-statistics JSON path. Relative
+                paths are resolved under the dataset root.
             cache_trajectories: Keep trajectories in memory (high RAM usage)
             return_language: Whether to return language instructions
             max_trajectories: Limit number of trajectories (for debugging)
@@ -231,6 +234,7 @@ class PrecomputedDroid(Dataset):
         self.img_keys_list = img_keys
         self.relabel_actions = relabel_actions
         self.normalize = normalize
+        self.norm_stats_path = norm_stats_path
         self.cache_trajectories = cache_trajectories
         self.return_language = return_language
         self.return_video_frames = return_video_frames
@@ -268,10 +272,16 @@ class PrecomputedDroid(Dataset):
 
         if self.normalize:
             suffix = 'relabel' if relabel_actions else 'recorded'
-            norm_path = self.root / f"norm_stats_{suffix}.json"
+            if self.norm_stats_path:
+                norm_path = Path(self.norm_stats_path).expanduser()
+                if not norm_path.is_absolute():
+                    norm_path = self.root / norm_path
+            else:
+                norm_path = self.root / f"norm_stats_{suffix}.json"
             assert norm_path.exists(), (
                 f"Normalization is enabled but {norm_path.name} was not found at {norm_path}. "
-                "Either add the norm_stats file or set dataset.normalize=False."
+                "Set dataset.norm_stats_path, add the norm_stats file to the dataset root, "
+                "or set dataset.normalize=False."
             )
             with open(norm_path, 'r') as f:
                 norm_stats = json.load(f)['norm_stats']

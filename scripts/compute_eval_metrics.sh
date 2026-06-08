@@ -18,7 +18,8 @@
 
 set -euo pipefail
 
-source "$(dirname "$0")/_env.sh"
+WEAVER_DIR=${WEAVER_DIR:-${SLURM_SUBMIT_DIR:-/home/mila/a/arnav-kumar.jain/LLM/WEAVER}}
+source "${WEAVER_DIR}/scripts/_env.sh"
 
 : "${EVAL_DIR:?Set EVAL_DIR=/path/to/evaluation/output}"
 
@@ -40,7 +41,7 @@ mkdir -p "$OUTPUT_DIR"
 read -r -a camera_args <<< "$CAMERAS"
 
 cmd=(
-  python -m weaver.evaluation.compute_metrics
+  python -m weaver.utils.metrics
   --views_dir "$VIEWS_DIR"
   --cameras "${camera_args[@]}"
   --start_frame "$START_FRAME"

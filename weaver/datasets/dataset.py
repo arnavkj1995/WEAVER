@@ -90,6 +90,7 @@ def create_dataset(
         img_keys=cfg.img_keys if hasattr(cfg, 'img_keys') else ['exterior_1_left', 'wrist_left'],
         relabel_actions=cfg.relabel_actions if hasattr(cfg, 'relabel_actions') else False,
         normalize=cfg.normalize if hasattr(cfg, 'normalize') else True,
+        norm_stats_path=cfg.norm_stats_path if hasattr(cfg, 'norm_stats_path') else None,
         cache_trajectories=False,
         return_language=True,
         max_trajectories=max_trajectories,

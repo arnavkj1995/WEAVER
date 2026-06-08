@@ -92,7 +92,7 @@ def evaluate_with_metrics_ddp(
     gc.collect()
 
     # Compute metrics
-    from .metrics import compute_fvd, compute_fid, compute_lpips
+    from .model_metrics import compute_fvd, compute_fid, compute_lpips
     print("Computing metrics...")
 
     for key in img_keys:
@@ -170,7 +170,7 @@ def evaluate_video_with_metrics_ddp(
         List of metric dicts, one per pred set. Each dict has keys like fvd_{key}, fid_{key}, lpips_{key}.
     """
     import gc
-    from .metrics import compute_fvd, compute_fid, compute_lpips
+    from .model_metrics import compute_fvd, compute_fid, compute_lpips
 
     def _to_tensor(v):
         """Convert to tensor. Handles List[Tensor] (variable-length) by padding to max T."""

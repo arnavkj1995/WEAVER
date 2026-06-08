@@ -37,11 +37,9 @@ Set `--output_root /path/to/weaver_droid` to write somewhere else.
 Shard preprocessing across jobs:
 
 ```bash
-python datasets/preprocess_droid.py \
-  --data_root /path/to/raw_droid \
-  --output_root /path/to/weaver_droid \
-  --chunks 8 \
-  --chunk_id 0
+DATA_ROOT=/path/to/raw_droid \
+OUTPUT_ROOT=/path/to/weaver_droid \
+sbatch datasets/preprocess_droid.sh
 ```
 
 After preprocessing, compute state/action normalization statistics:

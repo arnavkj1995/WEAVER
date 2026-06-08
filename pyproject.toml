@@ -1,0 +1,53 @@
+[project]
+name = "weaver-wm"
+version = "0.1.0"
+description = "WEAVER world models for robot video prediction."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+    "accelerate>=1.11.0",
+    "diffusers[torch]>=0.35.2",
+    "einops>=0.8.1",
+    "imageio[ffmpeg,pyav]>=2.37.2",
+    "lpips>=0.1.4",
+    "numpy>=1.26.4",
+    "opencv-python>=4.11.0.86",
+    "pandas>=2.2.3",
+    "pillow>=12.0.0",
+    "pyarrow>=18.1.0",
+    "pytorch-fid>=0.3.0",
+    "pyyaml>=6.0.3",
+    "scipy>=1.15.3",
+    "torch==2.7.0",
+    "torchmetrics>=1.8.2",
+    "torchvision>=0.22.0",
+    "tqdm>=4.67.1",
+    "transformers>=4.57.3",
+]
+
+[project.scripts]
+weaver-pretrain = "weaver.pretrain:main"
+weaver-finetune = "weaver.finetune:main"
+weaver-generate-views = "weaver.generate_views:main"
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "pytest",
+    "ruff",
+]
+flash-attn = [
+    "flash-attn==2.7.4.post1",
+]
+logging = [
+    "wandb>=0.23.0",
+]
+
+[tool.uv]
+package = true
+no-build-isolation-package = ["flash_attn"]
+
+[tool.uv.extra-build-dependencies]
+flash-attn = ["torch", "ninja", "packaging", "wheel", "setuptools"]

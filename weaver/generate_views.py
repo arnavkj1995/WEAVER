@@ -1,7 +1,8 @@
 """Generate WEAVER rollouts and save per-camera prediction views.
 
 This is the standalone evaluation/data-generation entrypoint. It intentionally
-does not compute metrics; use scripts/compute_metrics.py on the saved views.
+does not compute metrics; use `python -m weaver.utils.metrics`
+on the saved views.
 """
 
 from __future__ import annotations
@@ -103,6 +104,7 @@ def load_trajectories(cfg, split: str, img_keys: list[str], max_trajectories: in
         img_keys=img_keys,
         relabel_actions=cfg.dataset.relabel_actions,
         normalize=cfg.dataset.normalize,
+        norm_stats_path=getattr(cfg.dataset, "norm_stats_path", None),
         cache_trajectories=False,
         return_language=True,
         max_trajectories=max_trajectories,

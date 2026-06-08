@@ -1,0 +1,25 @@
+# General
+__pycache__/
+wandb**
+.gitattributes
+logs/*
+eval_debugging/
+docs/*
+# SAILOR specific
+**.mp4
+*.out
+*.png
+!assets/
+!assets/readme/
+!assets/readme/weaver-architecture.png
+sbatch/**
+scratch_dir**
+datasets/maniskill_datasets**
+datasets/robomimic_datasets**
+datasets/robocasa_datasets**
+datasets/RoboArena/raw/*
+datasets/RoboArena/preprocessed/*
+datasets/preprocessed_test/*
+droid*
+CLAUDE.md
+demos/**
