@@ -14,11 +14,11 @@ annotations under `/path/to/raw_droid/weaver_preprocessed`:
 
 ```text
 weaver_droid/
-├── annotation_rewards/
+├── annotations/
 │   └── <split>/<trajectory_id>.json
 ├── videos/
 │   └── <split>/<trajectory_id>.mp4
-├── latents_sd3/
+├── latents/
 │   └── <split>/<trajectory_id>.npz
 └── done/
     └── <split>/<trajectory_id>

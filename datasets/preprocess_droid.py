@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Tuple
 
 import cv2
 import imageio.v2 as imageio
+import imageio.v3 as iio
 import numpy as np
 import torch
 from einops import rearrange
@@ -41,24 +42,16 @@ def read_resized_video(
     image_size: Tuple[int, int],
     rgb_skip: int,
 ) -> np.ndarray:
-    cap = cv2.VideoCapture(str(path))
-    if not cap.isOpened():
-        raise FileNotFoundError(f"Could not open DROID video: {path}")
+    if not path.exists():
+        raise FileNotFoundError(f"DROID video not found: {path}")
 
     frames = []
-    frame_idx = 0
     height, width = image_size
-    while True:
-        ok, frame = cap.read()
-        if not ok:
-            break
+    for frame_idx, frame in enumerate(iio.imiter(path, plugin="FFMPEG")):
         if frame_idx % rgb_skip == 0:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frames.append(
                 cv2.resize(frame, (width, height), interpolation=cv2.INTER_LINEAR)
             )
-        frame_idx += 1
-    cap.release()
 
     if not frames:
         raise ValueError(f"No frames decoded from DROID video: {path}")
@@ -196,9 +189,7 @@ def preprocess_droid(
             if use_fp16:
                 latents = latents.astype(np.float16)
 
-            latent_relpath = (
-                Path("latents_sd3") / split / f"{trajectory_id}.npz"
-            )
+            latent_relpath = Path("latents") / split / f"{trajectory_id}.npz"
             latent_path = output_root / latent_relpath
             latent_path.parent.mkdir(parents=True, exist_ok=True)
             np.savez_compressed(latent_path, latents=latents)
@@ -256,7 +247,7 @@ def preprocess_droid(
             }
             annotation_path = (
                 output_root
-                / "annotation_rewards"
+                / "annotations"
                 / split
                 / f"{trajectory_id}.json"
             )
@@ -272,6 +263,10 @@ def preprocess_droid(
             errors += 1
 
     print(f"Processed {processed}, skipped {skipped}, errors {errors}")
+    if processed == 0 and errors > 0:
+        raise RuntimeError(
+            f"Chunk {chunk_id} processed no trajectories and encountered {errors} errors."
+        )
 
 
 def main() -> None:
