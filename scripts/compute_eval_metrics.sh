@@ -18,8 +18,7 @@
 
 set -euo pipefail
 
-WEAVER_DIR=${WEAVER_DIR:-${SLURM_SUBMIT_DIR:-/home/mila/a/arnav-kumar.jain/LLM/WEAVER}}
-source "${WEAVER_DIR}/scripts/_env.sh"
+source "$(dirname "$0")/_env.sh"
 
 : "${EVAL_DIR:?Set EVAL_DIR=/path/to/evaluation/output}"
 

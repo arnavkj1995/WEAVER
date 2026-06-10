@@ -1,6 +1,6 @@
 defaults:
 
-  scratch_dir: './scratch/SAILOR/'
+  scratch_dir: './scratch/WEAVER/'
   horizon: 8
   eval_horizon: 8
   eval_video_frames: 50
@@ -44,11 +44,11 @@ defaults:
     gradient_accumulation_steps: 1
 
   wandb:
-    project: 'sailorv2'
+    project: 'weaver'
     entity: 'world_model_team'
 
   experiment:
-    name: sailor_exp
+    name: weaver_exp
     seed: 42
 
   dataset:

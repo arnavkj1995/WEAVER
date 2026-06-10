@@ -404,7 +404,7 @@ def pad_and_stack(vid_list, max_t, pad_short_clips=False):
 def sliding_window_fvd_clips(vid_list, window_size=16, stride=8, pad_short_clips=True):
     """Extract training-style sliding FVD clips from per-video tensors.
 
-    Mirrors sailor/dreamer/metrics.py::_sliding_window_clips: clips are
+    Mirrors the original WEAVER sliding-window metric implementation: clips are
     generated every `stride` frames and the final possible window is included.
     """
     clips = []
