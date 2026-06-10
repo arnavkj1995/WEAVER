@@ -14,16 +14,10 @@
 
 set -euo pipefail
 
-WEAVER_DIR=${WEAVER_DIR:-${SLURM_SUBMIT_DIR:-/home/mila/a/arnav-kumar.jain/LLM/WEAVER}}
-ENV_SCRIPT="${WEAVER_DIR}/scripts/_env.sh"
-if [[ ! -f "${ENV_SCRIPT}" ]]; then
-  echo "WEAVER environment script not found: ${ENV_SCRIPT}" >&2
-  exit 1
-fi
-source "${ENV_SCRIPT}"
+source "$(dirname "$0")/../scripts/_env.sh"
 
-DATA_ROOT=${DATA_ROOT:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/DROID/droid_1.0.1}
-OUTPUT_ROOT=${OUTPUT_ROOT:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/DROID/preprocessed_v2}
+DATA_ROOT=${DATA_ROOT:-"$SCRATCH/WEAVER/DROID/droid_1.0.1"}
+OUTPUT_ROOT=${OUTPUT_ROOT:-"$SCRATCH/WEAVER/DROID/preprocessed_v2"}
 TOTAL_CHUNKS=64
 CHUNK_ID=${SLURM_ARRAY_TASK_ID:-0}
 BATCH_SIZE=${BATCH_SIZE:-64}

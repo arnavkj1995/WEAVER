@@ -21,11 +21,10 @@
 
 set -euo pipefail
 
-# source "$(dirname "$0")/_env.sh"
-source ../SAILOR-FM/.venv/bin/activate
+source "$(dirname "$0")/_env.sh"
 
-CHECKPOINT=${CHECKPOINT:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/libero/models/ft_1M_v22_2cams_bs8_gacc1_l32_h16_d1536_v-pred_SLS0.1_DFTrue_VRLFalse_RATrue_HZ8_MF6_SP0.5/logs/chkpts}
-OUTPUT_ROOT=${OUTPUT_ROOT:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/Evals/DROID/weaver}
+CHECKPOINT=${CHECKPOINT:-"$SCRATCH/WEAVER/models/ft_1M_v22_2cams_bs8_gacc1_l32_h16_d1536_v-pred_SLS0.1_DFTrue_VRLFalse_RATrue_HZ8_MF6_SP0.5/logs/chkpts"}
+OUTPUT_ROOT=${OUTPUT_ROOT:-"$SCRATCH/WEAVER/Evals/DROID/weaver"}
 NUM_CHUNKS=${NUM_CHUNKS:-8}
 START_IDX=${START_IDX:-20}
 SPLIT=${SPLIT:-val}
@@ -44,12 +43,12 @@ else
   case "$DATASET" in
     droid_val|droid)
       case_name=droid_val
-      DATASET_PATH=/home/mila/a/arnav-kumar.jain/scratch/SAILOR/DROID/preprocessed_v2
+      DATASET_PATH="$SCRATCH/WEAVER/DROID/preprocessed_v2"
       num_samples=256
       ;;
     ood|full_eval_ours|task_data)
       case_name=full_eval_ours
-      DATASET_PATH=/home/mila/a/arnav-kumar.jain/scratch/SAILOR/DROID/world_model_full_eval_ours
+      DATASET_PATH="$SCRATCH/WEAVER/DROID/world_model_full_eval_ours"
       num_samples=120
       ;;
     *)

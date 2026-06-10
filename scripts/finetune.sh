@@ -13,20 +13,12 @@
 
 set -euo pipefail
 
-module load libffi
-module load OpenSSL
-module load cuda/12.6.0/cudnn/9.3
+source "$(dirname "$0")/_env.sh"
 
-source ../SAILOR-FM/.venv/bin/activate
-
-export TORCH_HOME="${SCRATCH}/SAILOR/.cache/torch"
-export XDG_CACHE_HOME="${SCRATCH}/SAILOR/.cache"
-export HF_HOME="${SCRATCH}/.cache/huggingface"
-
-PRETRAINED_DIR=${PRETRAINED_DIR:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/libero/models/ft_1M_v22_2cams_bs8_gacc1_l32_h16_d1536_v-pred_SLS0.1_DFTrue_VRLFalse_RATrue_HZ8_MF6_SP0.5/logs/chkpts}
-DATASET_PATH=${DATASET_PATH:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/DROID/world_model_full_eval_ours}
-EXP_NAME=${EXP_NAME:-weaver_ft_1M_ood_16k_20260521}
-FINETUNE_SUFFIX=${FINETUNE_SUFFIX:-finetune_16k}
+PRETRAINED_DIR=${PRETRAINED_DIR:-"$SCRATCH/WEAVER/models/ft_1M_v22_2cams_bs8_gacc1_l32_h16_d1536_v-pred_SLS0.1_DFTrue_VRLFalse_RATrue_HZ8_MF6_SP0.5/logs/chkpts"}
+DATASET_PATH=${DATASET_PATH:-"$SCRATCH/WEAVER/DROID/world_model_full_eval_ours"}
+EXP_NAME=${EXP_NAME:-weaver_ft_16K}
+FINETUNE_SUFFIX=${FINETUNE_SUFFIX:-finetune_16K}
 NUM_GPUS=4
 MASTER_PORT=${MASTER_PORT:-29100}
 TRAIN_STEPS=${TRAIN_STEPS:-16000}
@@ -47,7 +39,7 @@ torchrun --standalone --nproc_per_node="${NUM_GPUS}" --master-port="${MASTER_POR
   --mode defaults \
   --pretrained_dir "${PRETRAINED_DIR}" \
   --finetune_suffix "${FINETUNE_SUFFIX}" \
-  scratch_dir="/home/mila/a/arnav-kumar.jain/scratch/SAILOR/libero/models/${EXP_NAME}" \
+  scratch_dir="$SCRATCH/WEAVER/models/${EXP_NAME}" \
   exp_name="${EXP_NAME}" \
   use_wandb=False \
   save_model=True \

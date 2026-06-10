@@ -13,21 +13,13 @@
 
 set -euo pipefail
 
-module load libffi
-module load OpenSSL
-module load cuda/12.6.0/cudnn/9.3
+source "$(dirname "$0")/_env.sh"
 
-source ../SAILOR-FM/.venv/bin/activate
-
-export TORCH_HOME="${SCRATCH}/SAILOR/.cache/torch"
-export XDG_CACHE_HOME="${SCRATCH}/SAILOR/.cache"
-export HF_HOME="${SCRATCH}/.cache/huggingface"
-
-PRETRAINED_DIR=${PRETRAINED_DIR:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/libero/models/weaver_ft_1M_ood_16k_20260521/logs/chkpts_finetune_16k}
+PRETRAINED_DIR=${PRETRAINED_DIR:-"$SCRATCH/WEAVER/models/weaver_ft_1M_ood_16k_20260521/logs/chkpts_finetune_16k"}
 PRETRAINED_CKPT_NAME=${PRETRAINED_CKPT_NAME:-checkpoint.pt}
-DATASET_PATH=${DATASET_PATH:-/home/mila/a/arnav-kumar.jain/scratch/SAILOR/DROID/world_model_full_eval_ours}
-EXP_NAME=${EXP_NAME:-weaver_reflow_ft16k_ood_4k_20260522}
-FINETUNE_SUFFIX=${FINETUNE_SUFFIX:-reflow_4k}
+DATASET_PATH=${DATASET_PATH:-"$SCRATCH/WEAVER/DROID/world_model_full_eval_ours"}
+EXP_NAME=${EXP_NAME:-weaver_reflow_4K}
+FINETUNE_SUFFIX=${FINETUNE_SUFFIX:-reflow_4K}
 NUM_GPUS=4
 MASTER_PORT=${MASTER_PORT:-29200}
 
@@ -70,7 +62,7 @@ torchrun --standalone --nproc_per_node="${NUM_GPUS}" --master-port="${MASTER_POR
   --pretrained_dir "${PRETRAINED_DIR}" \
   --pretrained_ckpt_name "${PRETRAINED_CKPT_NAME}" \
   --finetune_suffix "${FINETUNE_SUFFIX}" \
-  scratch_dir="/home/mila/a/arnav-kumar.jain/scratch/SAILOR/libero/models/${EXP_NAME}" \
+  scratch_dir="$SCRATCH/WEAVER/models/${EXP_NAME}" \
   exp_name="${EXP_NAME}" \
   use_wandb=False \
   save_model=True \
