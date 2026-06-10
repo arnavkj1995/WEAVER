@@ -50,3 +50,59 @@ python datasets/compute_norm_stats.py \
 ```
 
 TODO: Add reward annotations generated with RoboMeter.
+
+---
+
+## Preprocessing Customized OOD Data
+
+To preprocess your own collected task data (multiple source roots, each with
+task sub-directories containing `annotations/` and `videos/`) into the WEAVER
+format with SD3 latents and CLIP text features:
+
+```bash
+python -m datasets.preprocess_droid_ood \
+  --input_roots /path/to/ood_data /path/to/ood_data_add \
+  --output_root /path/to/ood_data_weaver \
+  --data_type train
+```
+
+The script produces the same layout as `preprocess_droid.py`:
+
+```text
+world_model_data_weaver/
+├── annotations/
+│   └── <data_type>/<id>.json    (includes text_features + latent_path)
+├── videos/
+│   └── <data_type>/<id>.mp4    (192x960, 3 cameras concatenated)
+├── latents/
+│   └── <data_type>/<id>_sd3.npz    (shape: 3 x T x 60 x 256, float16)
+└── done/
+    └── <data_type>/<id>    (marker files for resumability)
+```
+
+Run for both splits and then compute normalization statistics:
+
+```bash
+python -m datasets.preprocess_droid_ood \
+  --input_roots /path/to/ood_data /path/to/ood_data_add \
+  --output_root /path/to/ood_data_weaver \
+  --data_type train
+
+python -m datasets.preprocess_droid_ood \
+  --input_roots /path/to/ood_data /path/to/ood_data_add \
+  --output_root /path/to/ood_data_weaver \
+  --data_type val
+
+python datasets/compute_norm_stats.py \
+  --data_root /path/to/ood_data_weaver
+```
+
+To process only specific tasks, pass `--tasks`:
+
+```bash
+python -m datasets.preprocess_droid_ood \
+  --input_roots /path/to/ood_data \
+  --output_root /path/to/ood_data_weaver \
+  --data_type train \
+  --tasks pour_task stack_task
+```
