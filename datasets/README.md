@@ -49,10 +49,6 @@ python datasets/compute_norm_stats.py \
   --data_root /path/to/weaver_droid
 ```
 
-TODO: Add reward annotations generated with RoboMeter.
-
----
-
 ## Preprocessing Customized OOD Data
 
 To preprocess your own collected task data (multiple source roots, each with
@@ -106,3 +102,97 @@ python -m datasets.preprocess_droid_ood \
   --data_type train \
   --tasks pour_task stack_task
 ```
+
+---
+
+## Reward Labeling with RoboMeter
+
+WEAVER uses [RoboMeter-4B](https://huggingface.co/robometer/Robometer-4B)
+to label task progress and success offline. RoboMeter is included as the
+[`third_party/robometer`](../third_party/robometer) submodule.
+
+Set up RoboMeter in its own environment:
+
+```bash
+cd third_party/robometer
+uv sync
+```
+
+The batch client can label any dataset organized in the WEAVER format:
+
+```text
+<dataset_root>/
+├── annotations/<split>/<trajectory_id>.json
+└── videos/<split>/<trajectory_id>.mp4
+```
+
+Each annotation must provide the task instruction in `texts[0]`. Alternatively,
+pass `--task` to use one instruction for all selected videos.
+
+For each trajectory, the labeling pipeline:
+1. Loads the trajectory video. For a video containing multiple concatenated
+   camera views, pass `--view` to select the view used for reward prediction.
+2. Reads the task instruction from `annotation["texts"][0]`, unless overridden
+   with `--task`.
+3. Sends the selected frames and instruction to the RoboMeter evaluation
+   server. Frame-step expansion is disabled, so each trajectory uses one
+   full-trajectory inference.
+4. Receives two per-frame signals:
+   - `reward_progress`: predicted task progress.
+   - `reward_success`: predicted success probability.
+5. Linearly interpolates both signals back to the original video length.
+6. Computes the per-frame binary success label:
+
+   ```python
+   reward_binary = int(reward_success > 0.5)
+   ```
+
+7. Writes all three reward signals to the enriched annotations while preserving
+   the original annotation fields:
+
+   ```text
+   annotation_rewards/
+   ├── train/<trajectory_id>.json
+   └── val/<trajectory_id>.json
+   ```
+
+For videos concatenated as `right | left | wrist`, use `--view right`.
+Otherwise, omit `--view` or select the appropriate supported camera view.
+
+The WEAVER-format batch client is implemented in
+[`third_party/robometer/scripts/example_inference_droid_batch.py`](../third_party/robometer/scripts/example_inference_droid_batch.py).
+
+Start the RoboMeter server:
+
+```bash
+cd third_party/robometer
+uv run python robometer/evals/eval_server.py \
+  server_url=0.0.0.0 \
+  server_port=8000
+```
+
+Then label a dataset split from another terminal:
+
+```bash
+cd third_party/robometer
+uv run python scripts/example_inference_droid_batch.py \
+  --eval-server-url http://localhost:8000 \
+  --data-root /path/to/dataset \
+  --split train
+```
+
+For concatenated videos, add `--view right`. Repeat the client command
+with `--split val` to label the validation split.
+
+During training, the dataloader reads `reward_progress` from
+`annotation_rewards/<split>/` by default.
+
+With `dataset.negative_reward=True`, the dataloader applies:
+
+```python
+reward = reward_progress - 1.0
+```
+
+RoboMeter progress in `[0, 1]` therefore becomes a WEAVER reward in `[-1, 0]`.
+The current loading behavior is defined in
+[`weaver/datasets/droid.py`](../weaver/datasets/droid.py).

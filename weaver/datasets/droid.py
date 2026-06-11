@@ -70,7 +70,7 @@ def read_video_frames_range(video_path: str, start_idx: int, end_idx: int, num_c
 class DROIDTrajectory:
     """Container for a single DROID trajectory"""
 
-    def __init__(self, data_root: str, traj_id: int, data_type: str, load_on_init: bool = False, encoder_type: str = "svd", annotation_dir: str = "annotations"):
+    def __init__(self, data_root: str, traj_id: int, data_type: str, load_on_init: bool = False, encoder_type: str = "svd", annotation_dir: str = "annotation_rewards"):
         self.data_root = data_root
         self.traj_id = traj_id
         self.data_type = data_type
@@ -206,7 +206,7 @@ class PrecomputedDroid(Dataset):
         eval_mode: bool = False,
         reward_key: str = 'reward_progress',
         negative_reward: bool = True,
-        annotation_dir: str = 'annotations',
+        annotation_dir: str = 'annotation_rewards',
         collapse_prob: float = 0.1,
 
     ):

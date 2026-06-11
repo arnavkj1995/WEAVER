@@ -13,6 +13,12 @@ def create_dataloader(
     B: int = 32,
     n_workers: int = 4
 ) -> DataLoader:
+    worker_kwargs = {}
+    if n_workers > 0:
+        worker_kwargs = {
+            "persistent_workers": True,
+            "prefetch_factor": 4,
+        }
 
     if use_ddp:
         sampler = DistributedSampler(
@@ -30,9 +36,8 @@ def create_dataloader(
             num_workers=n_workers,
             pin_memory=True,
             pin_memory_device="cuda",
-            persistent_workers=True,
-            prefetch_factor=4,
             drop_last=True,  # Avoid incomplete batches that break torch.compile
+            **worker_kwargs,
         )
 
         return loader
@@ -45,9 +50,8 @@ def create_dataloader(
             num_workers=n_workers,
             pin_memory=True,
             pin_memory_device="cuda",
-            persistent_workers=True,
-            prefetch_factor=4,
             drop_last=True,  # Avoid incomplete batches that break torch.compile
+            **worker_kwargs,
         )
 
         return loader
@@ -123,7 +127,7 @@ def create_synth_dataloader(
         n_history=n_history,
         reward_key=getattr(cfg, "reward_key", "reward_progress"),
         negative_reward=getattr(cfg, "negative_reward", True),
-        annotation_dir=getattr(cfg, "annotation_dir", "annotations"),
+        annotation_dir=getattr(cfg, "annotation_dir", "annotation_rewards"),
         collapse_prob=0.0,
     )
 
@@ -192,7 +196,7 @@ def create_dataset(
         eval_mode=eval_mode,
         reward_key=cfg.reward_key if hasattr(cfg, 'reward_key') else 'reward_progress',
         negative_reward=cfg.negative_reward if hasattr(cfg, 'negative_reward') else True,
-        annotation_dir=cfg.annotation_dir if hasattr(cfg, 'annotation_dir') else 'annotations',
+        annotation_dir=cfg.annotation_dir if hasattr(cfg, 'annotation_dir') else 'annotation_rewards',
         collapse_prob=cfg.collapse_prob if hasattr(cfg, 'collapse_prob') else 0.1,
     )
 

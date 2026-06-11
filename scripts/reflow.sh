@@ -17,7 +17,7 @@ source "$(dirname "$0")/_env.sh"
 
 PRETRAINED_DIR=${PRETRAINED_DIR:-"$SCRATCH/WEAVER/models/weaver_ft_1M_ood_16k_20260521/logs/chkpts_finetune_16k"}
 PRETRAINED_CKPT_NAME=${PRETRAINED_CKPT_NAME:-checkpoint.pt}
-DATASET_PATH=${DATASET_PATH:-"$SCRATCH/WEAVER/DROID/world_model_full_eval_ours"}
+DATASET_PATH=${DATASET_PATH:-"$SCRATCH/WEAVER/DROID/droid_ood_data"}
 EXP_NAME=${EXP_NAME:-weaver_reflow_4K}
 FINETUNE_SUFFIX=${FINETUNE_SUFFIX:-reflow_4K}
 NUM_GPUS=4

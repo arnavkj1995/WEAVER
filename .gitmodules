@@ -2,3 +2,7 @@
 	path = third_party/openpi
 	url = https://github.com/yilin-wu98/openpi
 	branch = data_gen
+[submodule "third_party/robometer"]
+	path = third_party/robometer
+	url = https://github.com/yilin-wu98/robometer
+	branch = main

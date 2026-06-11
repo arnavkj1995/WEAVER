@@ -28,6 +28,7 @@ OUTPUT_ROOT=${OUTPUT_ROOT:-"$SCRATCH/WEAVER/Evals/DROID/weaver"}
 NUM_CHUNKS=${NUM_CHUNKS:-8}
 START_IDX=${START_IDX:-20}
 SPLIT=${SPLIT:-val}
+ANNOTATION_DIR=${ANNOTATION_DIR:-annotation_rewards}
 NUM_VIDEOS=${NUM_VIDEOS:-2}
 USE_REAL_HISTORY=${USE_REAL_HISTORY:-1}
 DATASET=${DATASET:-droid_val}
@@ -38,18 +39,15 @@ CHUNK_ID=$((TASK_ID % NUM_CHUNKS))
 
 if [[ -n "${DATASET_PATH:-}" ]]; then
   case_name=${CASE_NAME:-custom}
-  num_samples=${NUM_SAMPLES:-120}
 else
   case "$DATASET" in
     droid_val|droid)
       case_name=droid_val
       DATASET_PATH="$SCRATCH/WEAVER/DROID/preprocessed_v2"
-      num_samples=256
       ;;
-    ood|full_eval_ours|task_data)
-      case_name=full_eval_ours
-      DATASET_PATH="$SCRATCH/WEAVER/DROID/world_model_full_eval_ours"
-      num_samples=120
+    ood)
+      case_name=ood
+      DATASET_PATH="$SCRATCH/WEAVER/DROID/droid_ood_data"
       ;;
     *)
       echo "Unknown DATASET=$DATASET. Use DATASET=droid_val, DATASET=ood, or set DATASET_PATH explicitly."
@@ -57,6 +55,13 @@ else
       ;;
   esac
 fi
+
+annotation_dir="$DATASET_PATH/$ANNOTATION_DIR/$SPLIT"
+if [[ ! -d "$annotation_dir" ]]; then
+  echo "Annotation directory not found: $annotation_dir" >&2
+  exit 1
+fi
+num_samples=${NUM_SAMPLES:-$(find "$annotation_dir" -maxdepth 1 -type f -name '*.json' | wc -l)}
 
 if [[ -n "${RUN_NAME:-}" ]]; then
   output_dir="$OUTPUT_ROOT/$RUN_NAME"
@@ -66,7 +71,10 @@ else
   output_dir="$OUTPUT_ROOT/weaver_${history_tag}_${case_name}_start${START_IDX}${cache_tag}"
 fi
 
-overrides=(dataset.path="$DATASET_PATH")
+overrides=(
+  dataset.path="$DATASET_PATH"
+  dataset.annotation_dir="$ANNOTATION_DIR"
+)
 if [[ -n "${VAL_STEPS:-}" ]]; then
   overrides+=(model.val_steps="$VAL_STEPS")
 fi

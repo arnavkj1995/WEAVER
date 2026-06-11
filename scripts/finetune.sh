@@ -16,7 +16,7 @@ set -euo pipefail
 source "$(dirname "$0")/_env.sh"
 
 PRETRAINED_DIR=${PRETRAINED_DIR:-"$SCRATCH/WEAVER/models/ft_1M_v22_2cams_bs8_gacc1_l32_h16_d1536_v-pred_SLS0.1_DFTrue_VRLFalse_RATrue_HZ8_MF6_SP0.5/logs/chkpts"}
-DATASET_PATH=${DATASET_PATH:-"$SCRATCH/WEAVER/DROID/world_model_full_eval_ours"}
+DATASET_PATH=${DATASET_PATH:-"$SCRATCH/WEAVER/DROID/droid_ood_data"}
 EXP_NAME=${EXP_NAME:-weaver_ft_16K}
 FINETUNE_SUFFIX=${FINETUNE_SUFFIX:-finetune_16K}
 NUM_GPUS=4

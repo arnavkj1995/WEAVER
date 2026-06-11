@@ -60,7 +60,7 @@ defaults:
     relabel_actions: True
     normalize: True
     norm_stats_path: null
-    annotation_dir: annotations
+    annotation_dir: annotation_rewards
     reward_key: reward_progress
     negative_reward: True
     sample_aux_from_left_right: False

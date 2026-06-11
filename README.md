@@ -97,6 +97,7 @@ WEAVER
 ├── assets                           # README and release assets
 ├── datasets                         # DROID preprocessing and SD3 latent encoding utilities
 ├── scripts                          # Slurm launchers and offline evaluation scripts
+├── third_party                      # OpenPI and RoboMeter submodules
 ├── weaver                           # Core WEAVER package and training/generation entrypoints
 │   ├── datasets                     # Runtime DROID-style dataloaders
 │   ├── utils                        # Config, checkpointing, evaluation, and metric utilities
@@ -108,6 +109,8 @@ WEAVER
 ## 💾 Datasets
 
 WEAVER expects preprocessed DROID-style trajectories with actions, states, language features, rewards, normalization statistics, and either view videos or precomputed SD3 latents.
+Reward-enriched annotations are loaded from `annotation_rewards/<split>/` by
+default.
 
 Preprocess a raw DROID download into the format expected by WEAVER:
 
@@ -222,6 +225,7 @@ sbatch scripts/compute_eval_metrics.sh
 
 The folder may be the evaluation root or its `views/` subdirectory. It must
 contain the saved `gt_*.npy` and `pred_*.npy` camera views.
+All trajectories with complete GT and prediction files are included by default.
 
 ---
 
