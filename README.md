@@ -9,11 +9,7 @@
   <a href="https://www.cs.cmu.edu/~abajcsy/">Andrea Bajcsy</a><sup>3</sup>
 </p>
 
-<!-- TODO: add paper, arXiv, project website, pretrained checkpoints, and dataset links when public. -->
-
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)](https://www.python.org/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c?style=for-the-badge&logo=pytorch)](https://pytorch.org/)
 [![Website](https://img.shields.io/badge/Website-WEAVER-black?style=for-the-badge)](https://arnavkj1995.github.io/WEAVER/)
 [![Models](https://img.shields.io/badge/Models-%F0%9F%A4%97-yellow?style=for-the-badge)](https://huggingface.co/arnavkj1995/WEAVER)
 [![Dataset](https://img.shields.io/badge/Dataset-%F0%9F%A4%97-yellow?style=for-the-badge)](https://huggingface.co/datasets/yilin-wu/droid_ood_data)
@@ -29,7 +25,7 @@ We introduce WEAVER: a world model architecture that satisfies the three desider
 Create a Python 3.11 environment and install dependencies with `uv`.
 
 ```bash
-git clone <repo-url> WEAVER
+git clone --recurse-submodules https://github.com/arnavkj1995/WEAVER.git
 cd WEAVER
 uv venv --python 3.11
 source .venv/bin/activate
@@ -230,122 +226,30 @@ contain the saved `gt_*.npy` and `pred_*.npy` camera views.
 ---
 
 ## 🤖 Policy Evaluation
+To evaluate policy success rates with the world model, we replay trajectories with WEAVER and save the generated rollouts. We manually label the generated data to get success rate with the world model. We also provide per-frame reward estimates, which can be used to evaluate and rank robot policies without real-world rollouts.
 
-Replay saved DROID trajectories through WEAVER to obtain per-frame reward estimates, which can be used to evaluate and rank robot policies without real-world rollouts.
-
-For each trajectory, the script encodes real observation frames into WEAVER's latent space, autoregressively predicts future frames conditioned on recorded actions, scores the rollout with the learned reward head, and saves a side-by-side GT-vs-prediction comparison video with the reward curve overlaid.
-
-**Using the launcher script** (recommended):
-
-Edit the variables at the top of `scripts/replay_reward.sh` or override them inline:
+The following script encodes initial observation frames into WEAVER's latent space, then autoregressively predicts future frames conditioned on recorded actions, scores the rollout with the learned reward head, and saves a side-by-side GT-vs-prediction comparison video with the reward curve overlaid.
 
 ```bash
-# Override checkpoint, dataset, and trajectory IDs on the command line
-CHECKPOINT=/path/to/chkpts \
-DATASET_PATH=/path/to/dataset \
-TRAJ_IDS="10 11 12" \
-START_FRAME=0 \
-bash scripts/replay_reward.sh
+replay_options=(
+  CHECKPOINT=/path/to/chkpts       # Directory containing checkpoint.pt
+  DATASET_PATH=/path/to/dataset    # Preprocessed DROID-style dataset
+  OUTPUT_DIR=/path/to/output       # Generated videos and reward files
+  TRAJ_IDS="10 11 12"              # Set to "" to use NUM_TRAJS instead
+  NUM_TRAJS=10                     # Used only when TRAJ_IDS is empty
+  SAVE_REWARDS=1                   # Save rewards into annotation JSON files
+  SHOW_REWARD=0                    # Overlay the reward curve on videos
+)
+
+env "${replay_options[@]}" bash scripts/replay_reward.sh
 ```
 
-Key variables in the script:
+## 🎛️ Policy Finetuning
 
-| Variable | Default | Description |
-|---|---|---|
-| `CHECKPOINT` | — | Path to WEAVER checkpoint directory |
-| `DATASET_PATH` | — | Path to preprocessed DROID-style dataset |
-| `OUTPUT_DIR` | — | Directory for output videos and reward files |
-| `TRAJ_IDS` | `""` | Space-separated trajectory IDs; leave empty to use `NUM_TRAJS` |
-| `NUM_TRAJS` | `10` | Number of trajectories to process (used when `TRAJ_IDS` is empty) |
-| `START_FRAME` | `0` | First frame index within each trajectory |
-| `SPLIT` | `val` | Dataset split (`train` or `val`) |
-| `RELABEL_ACTIONS` | `1` | Use relabeled (position-difference) actions |
-| `SAVE_REWARDS` | `1` | Write per-frame rewards back into annotation JSON files |
-| `SHOW_REWARD` | `0` | Overlay reward curve on comparison video |
-
-**Direct command:**
-
-```bash
-python -m weaver.replay_traj_reward \
-  --checkpoint /path/to/chkpts \
-  --dataset-path /path/to/dataset \
-  --output-dir /path/to/output \
-  --split val \
-  --traj-ids 10 11 12 \
-  --start-frame 0 \
-  --use-ema \
-  --relabel-actions \
-  --save-rewards
-```
-
-## ⚗️ Synthetic Data Generation
-
-Generate synthetic action sequences with the base policy ($\pi_{0.5}$) policy and WEAVER using best-of-N sampling. For each source trajectory, the script samples a starting step from the trajectory. It uses the observations from that step to query the base policy for N action samples, rolls out each action sample with our world model WEAVER. It keeps the action generation for longer sequence by using the decoded observation from the WEAVER to query the base policy again for M chunks. It then scores each action sequence with the advantage value computed from the reward and critic heads for the entire sequence, and saves the best action candidate sequence as a labeled annotation + video. The resulting dataset can be used to finetune the base policy alone or combined with real data together to finetune the base policy.
-
-**Prerequisites: start the OpenPI server on a GPU machine (e.g. A6000) before running:**
-
-```bash
-# On the remote GPU machine — run from the openpi repo root
-uv run scripts/serve_policy.py --env DROID --num-samples 5
-```
-
-Then set `PI_HOST` to that machine's IP/hostname when launching the script below.
-
-**Using the launcher script** (recommended):
-
-```bash
-# Override inline
-CHECKPOINT=/path/to/chkpts \
-FILTER_EPISODE_ID="task" \
-DATASET_PATH=/path/to/dataset \
-PI_HOST=<server-ip> \
-DEBUG=0 \
-bash scripts/synth_data_gen.sh
-```
-
-Key variables in the script:
-
-| Variable | Default | Description |
-|---|---|---|
-| `CHECKPOINT` | — | Path to WEAVER checkpoint directory |
-| `DATASET_PATH` | — | Path to preprocessed DROID-style source dataset |
-| `OUTPUT_DIR` | — | Directory for generated trajectories and videos |
-| `DYNAMICS_MODEL` | `weaver/dynamics/model2_15_14.pth` | Path to Ctrl-World dynamics model checkpoint |
-| `NUM_TRAJECTORIES` | `5` | Number of trajectories to generate |
-| `NUM_SAMPLES` | `5` | Best-of-N: PI samples imagined per chunk |
-| `NUM_CHUNKS` | `4` | Imagination chunks per trajectory |
-| `OPEN_LOOP_HORIZON` | `9` | Control steps executed per chunk |
-| `SELECTION_CRITERION` | `advantage` | `reward` or `advantage` for best-of-N selection |
-| `FILTER_EPISODE_ID` | `"stack"` | Substring filter on source episode IDs; empty = no filter |
-| `PRED_ACTIONS` | `1` | Use predicted (dynamics-model) actions instead of recorded |
-| `DEBUG` | `1` | Save per-sample thumbnail comparison videos |
-| `PI_HOST` / `PI_PORT` | `localhost` / `8000` | OpenPI policy server address |
-
-**Direct command:**
-
-```bash
-python -m weaver.synth_data_gen \
-  --checkpoint /path/to/chkpts \
-  --dataset-path /path/to/dataset \
-  --output-dir /path/to/output \
-  --dynamics-model weaver/dynamics/model2_15_14.pth \
-  --num-trajectories 1000 \
-  --num-samples 5 \
-  --num-chunks 4 \
-  --open-loop-horizon 9 \
-  --selection-criterion advantage \
-  --filter-episode-id stack \
-  --use-ema \
-  --torch-compile \
-  --pred-actions \
-  --debug
-```
-
----
 
 <a id="collecting-custom-trajectories"></a>
 
-## 📹 Collecting Custom Trajectories
+### 📹 Collecting Custom Trajectories
 
 `third_party/openpi/examples/droid/panda_log.py` runs the policy on a real
 Franka Panda robot and logs each rollout as a video + annotation JSON in the
@@ -399,11 +303,46 @@ python -m datasets.preprocess_droid_ood \
 
 ---
 
-## 📦 Converting Synthetic Data for Finetuning
+### ⚗️ Synthetic Data Generation
+To finetune policies with WEAVER, we generate synthetic data with the base policy ($\pi_{0.5}$) and best-of-N sampling.
+The segments are obtained by replaying the base policy within WEAVER for M chunks. Each segment is scored with the advantage computed using the latent reward and critic heads for the entire sequence. The best action candidate sequence is added to the synthetic dataset. The synthetic dataset can be combined with real data to finetune the base policy.
 
-After generating synthetic data (or to package any mix of real + synthetic data for fine-tuning), use the two-step pipeline below.
+**Prerequisites: start the OpenPI server on a GPU machine (e.g. A6000) before running:**
 
-### Step 1 — Convert to DROID layout
+```bash
+# On the remote GPU machine — run from the openpi repo root
+uv run scripts/serve_policy.py --env DROID --num-samples 5
+```
+
+Then set `PI_HOST` to that machine's IP/hostname when launching the script below.
+
+```bash
+synth_options=(
+  CHECKPOINT=/path/to/chkpts          # Directory containing checkpoint.pt
+  DATASET_PATH=/path/to/dataset       # Preprocessed source dataset
+  OUTPUT_DIR=/path/to/output          # Generated trajectories and videos
+  DYNAMICS_MODEL=/path/to/model.pth   # Ctrl-World dynamics checkpoint
+  NUM_TRAJECTORIES=1000               # Number of trajectories to generate
+  NUM_SAMPLES=5                       # Best-of-N policy samples per chunk
+  NUM_CHUNKS=4                        # Imagination chunks per trajectory
+  OPEN_LOOP_HORIZON=9                 # Control steps executed per chunk
+  SELECTION_CRITERION=advantage       # Candidate ranking: reward or advantage
+  FILTER_EPISODE_ID="stack"           # Episode-ID substring; "" disables filtering
+  PI_HOST=<server-ip>                 # OpenPI policy server hostname or IP
+  PI_PORT=8000                        # OpenPI policy server port
+  DEBUG=0                             # Save per-sample debug videos
+)
+
+env "${synth_options[@]}" bash scripts/synth_data_gen.sh
+```
+
+---
+
+### 📦 Converting Synthetic Data for Finetuning
+
+After generating synthetic data (or to package any mix of real + synthetic data for fine-tuning), use the three-step pipeline below.
+
+#### Step 1 — Convert to DROID layout
 
 `convert_synthetic_data_to_droid.py` reads one or more root directories and
 assembles a unified DROID-format output folder.  Each `--tasks` entry is a
@@ -444,7 +383,7 @@ Output layout (one folder per trajectory, plus a shared annotations file):
     aggregated-annotations-030724.json
 ```
 
-### Step 2 — Convert DROID layout to LeRobot format
+#### Step 2 — Convert DROID layout to LeRobot format
 
 `convert_synthetic_droid_data_to_lerobot.py` ingests the output of Step 1 and
 writes a LeRobot dataset.  Pass `--repo_name` to set both the local dataset
@@ -456,7 +395,7 @@ python third_party/openpi/examples/droid/convert_synthetic_droid_data_to_lerobot
     --repo_name your-hf-username/your-dataset-name
 ```
 
-### Step 3 — Fine-tune π₀.₅ on the converted dataset
+#### Step 3 — Fine-tune π₀.₅ on the converted dataset
 
 > **Before running:** open `third_party/openpi/src/openpi/training/config.py` and
 > update the `repo_id` on line 905 to match the `--repo_name` you used in Step 2:
@@ -477,9 +416,8 @@ uv run scripts/train.py pi05_droid_finetune_real_syn_adv \
 
 ---
 
-## 🕹️ Test-time Steering with WEAVER
-
-For each observation, the script queries the base policy ($\pi_{0.5}$) for N action samples, rolls each through WEAVER's world model, scores the imagined action chunks with the advantage computed from the learned reward and critic heads, and executes only the best-scoring action chunk on the robot. This closed-loop steering improves real-world task success without any additional training.
+## 🕹️ Test-time Planning
+WEAVER post-trained with rectified flow objective enables test-time steering with reduced inference cost and efficient generations in the latent space. For each observation, the script queries the base policy ($\pi_{0.5}$) for N action samples, rolls and scores them using advantage computed with WEAVER. The best action chunk is executed on the robot. This closed-loop steering improves real-world task success without any additional training.
 
 **Prerequisites: start the OpenPI server on a GPU machine (e.g. A6000) before running:**
 
@@ -490,47 +428,21 @@ uv run scripts/serve_policy.py --env DROID --num-samples 5
 
 Then set `PI_HOST` to that machine's IP/hostname when launching the script below.
 
-**Using the launcher script** (recommended):
-
 ```bash
-# Override task, number of samples, and server address inline
-TASK="stack the red block on the blue block" \
-NUM_SAMPLES=8 \
-PI_HOST=<server-ip> \
-bash scripts/steer_pi_policy.sh
-```
+planning_options=(
+  CHECKPOINT=/path/to/chkpts          # Directory containing checkpoint.pt
+  OUTPUT_DIR=/path/to/output          # Output videos and debug grids
+  DYNAMICS_MODEL=/path/to/model.pth   # Ctrl-World dynamics checkpoint
+  TASK="stack the red block"           # Robot language instruction
+  NUM_SAMPLES=8                       # Best-of-N policy samples per chunk
+  OPEN_LOOP_HORIZON=9                 # Control steps before re-planning
+  SELECTION_CRITERION=advantage       # Candidate ranking: reward or advantage
+  MAX_STEPS=700                       # Maximum control steps per trial
+  PI_HOST=<server-ip>                 # OpenPI policy server hostname or IP
+  PI_PORT=8000                        # OpenPI policy server port
+)
 
-Key variables in the script:
-
-| Variable | Default | Description |
-|---|---|---|
-| `CHECKPOINT` | — | Path to WEAVER checkpoint directory |
-| `OUTPUT_DIR` | — | Directory for output videos and debug grids |
-| `DYNAMICS_MODEL` | `weaver/dynamics/model2_15_14.pth` | Path to Ctrl-World dynamics model checkpoint |
-| `TASK` | — | Language instruction for the robot |
-| `NUM_SAMPLES` | `4` | Best-of-N: PI samples imagined per chunk |
-| `OPEN_LOOP_HORIZON` | `9` | Control steps executed before re-planning |
-| `SELECTION_CRITERION` | `advantage` | `reward` or `advantage` for best-of-N selection |
-| `MAX_STEPS` | `700` | Maximum control steps per trial |
-| `USE_KV_CACHE` | `1` | Reuse prefix K/V across denoising steps for faster inference |
-| `RELABEL_ACTION` | `1` | Use dynamics model to compute position-difference actions |
-| `PI_HOST` / `PI_PORT` | `localhost` / `8000` | PI policy server address |
-
-**Direct command:**
-
-```bash
-python -m weaver.steer_pi_policy \
-  --checkpoint /path/to/chkpts \
-  --output-dir /path/to/output \
-  --dynamics-model weaver/dynamics/model2_15_14.pth \
-  --task "pick up the marker and place it in the cup" \
-  --num-samples 4 \
-  --open-loop-horizon 9 \
-  --selection-criterion advantage \
-  --use-ema \
-  --torch-compile \
-  --use-kv-cache \
-  --relabel-action
+env "${planning_options[@]}" bash scripts/steer_pi_policy.sh
 ```
 
 ---

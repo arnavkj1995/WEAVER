@@ -11,6 +11,7 @@ dependencies = [
     "einops>=0.8.1",
     "imageio[ffmpeg,pyav]>=2.37.2",
     "lpips>=0.1.4",
+    "mediapy>=1.2.4",
     "numpy>=1.26.4",
     "opencv-python>=4.11.0.86",
     "pandas>=2.2.3",
@@ -24,7 +25,6 @@ dependencies = [
     "torchvision>=0.22.0",
     "tqdm>=4.67.1",
     "transformers>=4.57.3",
-    "openpi-client",
 ]
 
 [project.scripts]
@@ -46,12 +46,13 @@ logging = [
     "wandb>=0.23.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["weaver*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+weaver = ["config.yaml"]
+
 [tool.uv]
 package = true
 no-build-isolation-package = ["flash_attn"]
-
-[tool.uv.sources]
-openpi-client = { path = "third_party/openpi/packages/openpi-client", editable = true }
-
-[tool.uv.extra-build-dependencies]
-flash-attn = ["torch", "ninja", "packaging", "wheel", "setuptools"]
