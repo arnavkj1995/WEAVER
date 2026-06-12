@@ -131,6 +131,24 @@ h1 {
   box-shadow: 0 8px 18px rgba(32, 33, 36, 0.1);
 }
 
+.project-link.hf-link {
+  gap: 10px;
+  min-width: 152px;
+  min-height: 51px;
+  padding: 0 19px;
+  font-size: 1.12rem;
+}
+
+.project-link.hf-link .icon {
+  width: 27px;
+  height: 27px;
+}
+
+.project-link.hf-link .icon img {
+  width: 17px;
+  height: 17px;
+}
+
 .project-link:hover {
   border-color: #aab4c3;
   transform: translateY(-1px);
@@ -377,11 +395,6 @@ h1 {
   outline-offset: 3px;
 }
 
-.world-model-controls .compact-control:nth-child(2) .task-tab {
-  font-size: 1.09rem;
-  padding: 10px 17px;
-}
-
 .video-figure video {
   display: block;
   width: 100%;
@@ -459,8 +472,52 @@ h1 {
 
 .world-model-controls {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 18px;
+}
+
+.world-model-task-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.world-model-task-row .compact-control {
+  flex: 0 0 auto;
+}
+
+.world-model-task-row .compact-control[hidden] {
+  display: none;
+}
+
+.world-model-dataset-control {
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+}
+
+.world-model-controls .task-tabs {
+  gap: 6px;
+}
+
+.world-model-controls .task-tab {
+  padding: 8px 13px;
+  font-size: 0.98rem;
+}
+
+.world-model-dataset-control .task-tab {
+  padding-inline: 12px;
+  font-size: 0.9rem;
+}
+
+.world-model-nfe-control {
+  justify-self: center;
+}
+
+.world-model-nfe-control .task-tab {
+  padding: 7px 13px;
+  font-size: 0.92rem;
 }
 
 .world-model-video-figure {

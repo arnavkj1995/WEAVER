@@ -37,13 +37,21 @@
           <sup>4</sup>McGill University
         </p>
         <div class="link-row" aria-label="Project links">
-          <a class="project-link disabled" href="#" aria-disabled="true">
+          <a
+            class="project-link"
+            href="https://arxiv.org/abs/2606.13672"
+            rel="noreferrer"
+          >
             <span class="icon" aria-hidden="true">
               <img src="assets/icons/arxiv.svg" alt="" />
             </span>
             arXiv
           </a>
-          <a class="project-link disabled" href="#" aria-disabled="true">
+          <a
+            class="project-link"
+            href="https://arxiv.org/pdf/2606.13672"
+            rel="noreferrer"
+          >
             <span class="icon" aria-hidden="true">
               <img src="assets/icons/file-pdf.svg" alt="" />
             </span>
@@ -59,15 +67,25 @@
             </span>
             Code
           </a>
-          <a class="project-link disabled" href="#" aria-disabled="true">
+          <a
+            class="project-link hf-link"
+            href="https://huggingface.co/arnavkj1995/WEAVER"
+            rel="noreferrer"
+          >
             <span class="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <ellipse cx="12" cy="5" rx="7" ry="3" />
-                <path d="M5 5v14c0 1.7 3.1 3 7 3s7-1.3 7-3V5" />
-                <path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" />
-              </svg>
+              <img src="assets/icons/huggingface.svg" alt="" />
             </span>
-            Data
+            Model Weights
+          </a>
+          <a
+            class="project-link hf-link"
+            href="https://huggingface.co/datasets/yilin-wu/droid_ood_data"
+            rel="noreferrer"
+          >
+            <span class="icon" aria-hidden="true">
+              <img src="assets/icons/huggingface.svg" alt="" />
+            </span>
+            OOD Data
           </a>
         </div>
       </div>
@@ -208,28 +226,72 @@
         </figure>
         <div class="video-block world-model-eval-videos" id="world-model-eval-videos">
           <div class="world-model-controls">
-            <div class="video-controls compact-control">
-              <span class="video-label sr-only" id="world-model-traj-label">World model evaluation trajectory</span>
-              <div
-                class="task-tabs"
-                role="tablist"
-                aria-labelledby="world-model-traj-label"
-              >
-                <button class="task-tab active" type="button" data-task="101" role="tab">PnP Marker</button>
-                <button class="task-tab" type="button" data-task="15" role="tab">Pour Beans</button>
-                <button class="task-tab" type="button" data-task="30" role="tab">PnP Towel</button>
-                <button class="task-tab" type="button" data-task="98" role="tab">Stack Bowls</button>
-                <button class="task-tab" type="button" data-task="55" role="tab">PnP Bag</button>
+            <div class="world-model-task-row">
+              <div class="video-controls compact-control world-model-dataset-control">
+                <span class="video-label sr-only" id="world-model-dataset-label">World model evaluation dataset</span>
+                <div
+                  class="task-tabs"
+                  role="tablist"
+                  aria-labelledby="world-model-dataset-label"
+                >
+                  <button class="task-tab active" type="button" data-task="ood" role="tab">OOD</button>
+                  <button class="task-tab" type="button" data-task="droid" role="tab">DROID</button>
+                </div>
+                <select
+                  id="world-model-dataset"
+                  class="task-select task-select-hidden"
+                  aria-hidden="true"
+                  tabindex="-1"
+                >
+                  <option value="ood">OOD</option>
+                  <option value="droid">DROID</option>
+                </select>
               </div>
-              <select id="world-model-traj" class="task-select task-select-hidden" aria-hidden="true" tabindex="-1">
-                <option value="101">PnP Marker</option>
-                <option value="15">Pour Beans</option>
-                <option value="30">PnP Towel</option>
-                <option value="98">Stack Bowls</option>
-                <option value="55">PnP Bag</option>
-              </select>
+              <div class="video-controls compact-control world-model-traj-control" id="world-model-ood-traj-control">
+                <span class="video-label sr-only" id="world-model-traj-label">World model evaluation trajectory</span>
+                <div
+                  class="task-tabs"
+                  role="tablist"
+                  aria-labelledby="world-model-traj-label"
+                >
+                  <button class="task-tab active" type="button" data-task="101" role="tab">PnP Marker</button>
+                  <button class="task-tab" type="button" data-task="15" role="tab">Pour Beans</button>
+                  <button class="task-tab" type="button" data-task="30" role="tab">PnP Towel</button>
+                  <button class="task-tab" type="button" data-task="98" role="tab">Stack Bowls</button>
+                  <button class="task-tab" type="button" data-task="55" role="tab">PnP Bag</button>
+                </div>
+                <select id="world-model-traj" class="task-select task-select-hidden" aria-hidden="true" tabindex="-1">
+                  <option value="101">PnP Marker</option>
+                  <option value="15">Pour Beans</option>
+                  <option value="30">PnP Towel</option>
+                  <option value="98">Stack Bowls</option>
+                  <option value="55">PnP Bag</option>
+                </select>
+              </div>
+              <div class="video-controls compact-control world-model-traj-control" id="world-model-droid-traj-control" hidden>
+                <span class="video-label sr-only" id="world-model-droid-traj-label">DROID validation trajectory</span>
+                <div
+                  class="task-tabs"
+                  role="tablist"
+                  aria-labelledby="world-model-droid-traj-label"
+                >
+                  <button class="task-tab active" type="button" data-task="1399" role="tab">Move Bowl</button>
+                  <button class="task-tab" type="button" data-task="2799" role="tab">Coke Can to Sink</button>
+                  <button class="task-tab" type="button" data-task="3099" role="tab">Move Grey Fleece</button>
+                </div>
+                <select
+                  id="world-model-droid-traj"
+                  class="task-select task-select-hidden"
+                  aria-hidden="true"
+                  tabindex="-1"
+                >
+                  <option value="1399">Move Bowl</option>
+                  <option value="2799">Coke Can to Sink</option>
+                  <option value="3099">Move Grey Fleece</option>
+                </select>
+              </div>
             </div>
-            <div class="video-controls compact-control">
+            <div class="video-controls compact-control world-model-nfe-control">
               <span class="video-label sr-only" id="world-model-nfe-label">World model evaluation NFE</span>
               <div
                 class="task-tabs"
@@ -541,6 +603,36 @@
       window.addEventListener("scroll", updateScrollProgress, { passive: true });
       window.addEventListener("resize", updateScrollProgress);
 
+      const delayedLoopTimers = new WeakMap();
+
+      function enableDelayedLoop(video, delayMs = 1000) {
+        video.loop = false;
+
+        function clearDelayedLoop() {
+          const timer = delayedLoopTimers.get(video);
+          if (timer !== undefined) {
+            window.clearTimeout(timer);
+            delayedLoopTimers.delete(video);
+          }
+        }
+
+        video.addEventListener("play", clearDelayedLoop);
+        video.addEventListener("loadstart", clearDelayedLoop);
+        video.addEventListener("ended", () => {
+          clearDelayedLoop();
+          const timer = window.setTimeout(() => {
+            delayedLoopTimers.delete(video);
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }, delayMs);
+          delayedLoopTimers.set(video, timer);
+        });
+      }
+
+      document.querySelectorAll("video[loop]").forEach((video) => {
+        enableDelayedLoop(video);
+      });
+
       function bindTaskTabs(select) {
         const controls = select.closest(".video-controls");
         const tabs = controls ? controls.querySelectorAll(".task-tab") : [];
@@ -589,18 +681,36 @@
 
       document.querySelectorAll(".task-select").forEach(bindTaskTabs);
 
+      const worldModelDataset = document.querySelector("#world-model-dataset");
       const worldModelTraj = document.querySelector("#world-model-traj");
+      const worldModelDroidTraj = document.querySelector("#world-model-droid-traj");
       const worldModelNfe = document.querySelector("#world-model-nfe");
       const worldModelVideo = document.querySelector("#world-model-eval-video");
-      if (worldModelTraj && worldModelNfe && worldModelVideo) {
+      const worldModelOodControl = document.querySelector("#world-model-ood-traj-control");
+      const worldModelDroidControl = document.querySelector("#world-model-droid-traj-control");
+      if (
+        worldModelDataset &&
+        worldModelTraj &&
+        worldModelDroidTraj &&
+        worldModelNfe &&
+        worldModelVideo
+      ) {
         function updateWorldModelVideo() {
-          worldModelVideo.src = `assets/videos/world_model_eval/traj${worldModelTraj.value}_nfe${worldModelNfe.value}.mp4`;
+          const isDroid = worldModelDataset.value === "droid";
+          const trajectory = isDroid ? worldModelDroidTraj.value : worldModelTraj.value;
+          const prefix = isDroid ? "droid_traj" : "traj";
+          if (worldModelOodControl) worldModelOodControl.hidden = isDroid;
+          if (worldModelDroidControl) worldModelDroidControl.hidden = !isDroid;
+          worldModelVideo.src = `assets/videos/world_model_eval/${prefix}${trajectory}_nfe${worldModelNfe.value}.mp4`;
           worldModelVideo.load();
           worldModelVideo.play().catch(() => {});
         }
 
+        worldModelDataset.addEventListener("change", updateWorldModelVideo);
         worldModelTraj.addEventListener("change", updateWorldModelVideo);
+        worldModelDroidTraj.addEventListener("change", updateWorldModelVideo);
         worldModelNfe.addEventListener("change", updateWorldModelVideo);
+        updateWorldModelVideo();
       }
 
       const policyEvalTask = document.querySelector("#policy-eval-task");
