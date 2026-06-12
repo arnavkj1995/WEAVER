@@ -9,6 +9,7 @@
   <a href="https://www.cs.cmu.edu/~abajcsy/">Andrea Bajcsy</a><sup>3</sup>
 </p>
 
+[![arXiv](https://img.shields.io/badge/arXiv-2506.05294-df2a2a.svg?style=for-the-badge&logo=arxiv)](https://arxiv.org/abs/2606.13672)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-WEAVER-black?style=for-the-badge)](https://arnavkj1995.github.io/WEAVER/)
 [![Models](https://img.shields.io/badge/Models-%F0%9F%A4%97-yellow?style=for-the-badge)](https://huggingface.co/arnavkj1995/WEAVER)
@@ -456,9 +457,11 @@ env "${planning_options[@]}" bash scripts/steer_pi_policy.sh
 If you use WEAVER, please cite the corresponding paper once available.
 
 ```bibtex
-@article{weaver2026,
+@article{jain2026weaver,
   title={WEAVER: Efficient World Models for Robot Video Prediction},
-  author={TBD},
+  author={Arnav Kumar Jain and Yilin Wu and Jesse Farebrother and Gokul Swamy and Andrea Bajcsy},
+  journal={CoRR},
+  volume={abs/2606.13672},
   year={2026}
 }
 ```
