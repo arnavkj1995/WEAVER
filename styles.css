@@ -247,10 +247,11 @@ h1 {
 
 .teaser-section {
   padding-top: 24px;
+  --teaser-content-width: 980px;
 }
 
 .teaser-lede {
-  max-width: 980px;
+  width: min(100%, var(--teaser-content-width));
   margin-bottom: 18px;
 }
 
@@ -278,7 +279,7 @@ h1 {
 }
 
 .hero-figure {
-  max-width: 980px;
+  width: min(100%, var(--teaser-content-width, 980px));
   margin: 0 auto;
 }
 
