@@ -260,7 +260,8 @@ h1 {
   background: #fff;
 }
 
-.paper-figure img {
+.paper-figure img,
+.paper-figure video {
   display: block;
   width: 100%;
   height: auto;
