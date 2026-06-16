@@ -10,16 +10,18 @@
 </p>
 
 [![arXiv](https://img.shields.io/badge/arXiv-2506.05294-df2a2a.svg?style=for-the-badge&logo=arxiv)](https://arxiv.org/abs/2606.13672)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-WEAVER-black?style=for-the-badge)](https://arnavkj1995.github.io/WEAVER/)
+[![Summary](https://img.shields.io/badge/Summary-1DA1F2?logo=x&logoColor=white&labelColor=gray&style=for-the-badge)](https://x.com/arnavkj95/status/2066919523685380387?s=20)
 [![Models](https://img.shields.io/badge/Models-%F0%9F%A4%97-yellow?style=for-the-badge)](https://huggingface.co/arnavkj1995/WEAVER)
 [![Dataset](https://img.shields.io/badge/Dataset-%F0%9F%A4%97-yellow?style=for-the-badge)](https://huggingface.co/datasets/yilin-wu/droid_ood_data)
-
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 ---
 
 We introduce WEAVER: a world model architecture that satisfies the three desiderata: (i) fidelity, (ii) consistency, and (iii) efficiency. WEAVER unlocks state-of-the-art performance across policy evaluation (ρ = 0.870 correlation with real-world success rate), policy improvement (real-world success rate improvement of 38% on top of the π0.5 robot foundation model), and test-time planning (real-world success rate improvement of 14% with a 5–10× speedup over prior WMs).
 
-![WEAVER architecture](assets/readme/weaver-architecture.png)
+<p align="center">
+  <img src="assets/readme/teaser.gif" alt="WEAVER teaser" width="100%">
+</p>
 
 ## 🛠️ Setup
 

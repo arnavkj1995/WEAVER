@@ -13,6 +13,7 @@ docs/*
 !assets/
 !assets/readme/
 !assets/readme/weaver-architecture.png
+!assets/readme/teaser.gif
 sbatch/**
 scratch_dir**
 datasets/maniskill_datasets**
