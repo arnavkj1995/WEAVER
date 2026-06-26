@@ -23,14 +23,15 @@ CONFIG=${CONFIG:-weaver/config.yaml}
 MODE=${MODE:-defaults}
 NUM_GPUS=4
 MASTER_PORT=${MASTER_PORT:-29000}
+EXP_NAME=${EXP_NAME:-wm_pretrain}
+SCRATCH_DIR=${SCRATCH_DIR:-"$SCRATCH/WEAVER/models/$EXP_NAME"}
 
 overrides=()
 if [[ -n "${DATASET_PATH:-}" ]]; then
   overrides+=(dataset.path="$DATASET_PATH")
 fi
-if [[ -n "${SCRATCH_DIR:-}" ]]; then
-  overrides+=(scratch_dir="$SCRATCH_DIR")
-fi
+overrides+=(scratch_dir="$SCRATCH_DIR")
+overrides+=(exp_name="$EXP_NAME")
 if [[ -n "${EXTRA_OVERRIDES:-}" ]]; then
   read -r -a extra <<< "$EXTRA_OVERRIDES"
   overrides+=("${extra[@]}")
