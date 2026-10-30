@@ -1089,6 +1089,8 @@ code {
 
 pre code {
   font-size: 0.94rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .footer {

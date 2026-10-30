@@ -39,17 +39,7 @@
         <div class="link-row" aria-label="Project links">
           <a
             class="project-link"
-            href="https://arxiv.org/abs/2606.13672"
-            rel="noreferrer"
-          >
-            <span class="icon" aria-hidden="true">
-              <img src="assets/icons/arxiv.svg" alt="" />
-            </span>
-            arXiv
-          </a>
-          <a
-            class="project-link"
-            href="https://arxiv.org/pdf/2606.13672"
+            href="assets/weaver_paper.pdf"
             rel="noreferrer"
           >
             <span class="icon" aria-hidden="true">
@@ -94,20 +84,15 @@
     <main>
       <section class="section teaser-section" aria-label="WEAVER teaser">
         <p class="section-lede teaser-lede">
-          We introduce <code>WEAVER</code>: a world model architecture that satisfies the three desiderata: (i) fidelity, (ii) consistency, and (iii) efficiency. <code>WEAVER</code> unlocks state-of-the-art performance across policy evaluation (<i>ρ</i> = 0.870 correlation with real-world success rate), policy improvement (real-world success rate improvement of 38% on top of the <i>π</i><sub>0.5</sub> robot foundation model), and test-time planning (real-world success rate improvement of 14% with a 5–10× speedup over prior WMs).
+          We introduce <code>WEAVER</code>: a world model architecture that satisfies the three desiderata: (i) fidelity, (ii) consistency, and (iii) efficiency. <code>WEAVER</code> unlocks state-of-the-art performance across policy evaluation (<i>ρ</i> = 0.817 correlation with real-world success rate), policy improvement (real-world success rate improvement of 38% on top of the <i>π</i><sub>0.5</sub> robot foundation model), and test-time planning (real-world success rate improvement of 14% made possible by up to 20× inference speedup over prior WMs).
           <!-- <code>WEAVER</code> is a robot world model that satisfies three desiderata: -->
           <!-- high fidelity, long-horizon consistency, and efficient generation. -->
         </p>
         <figure class="paper-figure hero-figure">
-          <video
-            src="assets/teaser.mp4"
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="metadata"
-            aria-label="WEAVER teaser video showing robot manipulation rollouts."
-          ></video>
+          <img
+            src="assets/weaver_front.png"
+            alt="WEAVER overview: fidelity, consistency, and efficiency trade-offs, with rollout comparisons against Ctrl-World and Cosmos3-Nano, and downstream policy evaluation, improvement, and test-time planning."
+          />
         </figure>
 
         <div class="feature-list">
@@ -150,10 +135,11 @@
           decisions across model architecture, memory, and prediction objectives
           to support long-horizon dynamic manipulation tasks that have
           confounded prior world modeling approaches. On robotic hardware, <code>WEAVER</code> demonstrates effective policy evaluation
-          with rho = 0.870 correlation to real-world success rate, policy
+          with rho = 0.817 correlation to real-world success rate, policy
           improvement with a 38% real-world success-rate gain on top of the
-          pi_0.5 robot foundation model, and test-time planning with a 14-15%
-          success-rate gain plus a 5-10x speedup over prior world models.
+          pi_0.5 robot foundation model, and test-time planning with a 14%
+          success-rate gain made possible by up to 20x inference speedup over
+          prior world models.
         </p>
       </section> -->
 
@@ -210,24 +196,35 @@
       <section id="results" class="section result-section">
         <h2>World Model Evaluation</h2>
         <p class="section-lede">
-          <code>WEAVER</code> achieves better performance than Ctrl-World on DROID
-          validation and out-of-distribution (OOD) task data while using significantly lower inference time.
+          <code>WEAVER</code> outperforms Ctrl-World and Cosmos3-Nano on DROID
+          validation and out-of-distribution (OOD) task data while requiring less inference time.
           As we decrease the number of function evaluations (NFE) to reduce
-          latency, Ctrl-World's quality decreases more significantly than
-          <code>WEAVER</code>; both models incur the highest error when
-          predicting wrist-camera viewpoints.
+          latency, the baselines degrade substantially more than
+          <code>WEAVER</code>; <code>WEAVER</code> at NFE=16 matches or exceeds both
+          baselines at NFE=50, a 9&times; inference speedup. Cosmos3-Nano degrades most
+          with prediction horizon, likely because it lacks an explicit memory mechanism.
         </p>
         <figure class="paper-figure full-figure">
           <img
-            src="assets/fid_fvd_vs_h100_time_real_history_2x4.png"
-            alt="FID and FVD versus H100 inference time for WEAVER and Ctrl-World."
+            src="assets/fvd_vs_inference_time.png"
+            alt="FVD versus H100 inference time for WEAVER, Ctrl-World, and Cosmos3-Nano at NFE 8, 16, 32, and 50, on DROID and OOD data for exterior and wrist views."
           />
-          <!-- <figcaption>
-            <strong>World-model evaluation.</strong>
-            <code>WEAVER</code>
-            generates higher-fidelity rollouts than Ctrl-World and performs
-            substantially better at low inference budgets.
-          </figcaption> -->
+          <figcaption>
+            <strong>Inference speed vs. generation quality.</strong>
+            <code>WEAVER</code> pareto-dominates both baselines, matching or
+            exceeding their NFE=50 quality at NFE=16.
+          </figcaption>
+        </figure>
+        <figure class="paper-figure full-figure">
+          <img
+            src="assets/fvd_vs_horizon.png"
+            alt="FVD versus prediction horizon for WEAVER, Ctrl-World, and Cosmos3-Nano on DROID and OOD data for exterior and wrist views."
+          />
+          <figcaption>
+            <strong>Long-horizon quality.</strong>
+            <code>WEAVER</code> maintains lower FVD as the prediction horizon
+            grows, while Cosmos3-Nano degrades most quickly.
+          </figcaption>
         </figure>
         <div class="video-block world-model-eval-videos" id="world-model-eval-videos">
           <div class="world-model-controls">
@@ -356,20 +353,26 @@
         <div class="application-block">
           <h3>Policy Evaluation</h3>
           <p>
-            To evaluate policies offline, we replay recorded real-world action
-            trajectories open-loop in <code>WEAVER</code> and label the imagined
-            rollouts. This turns the world model into a sandbox for ranking
-            policies without additional robot execution. We show that
-            pretrained world models often underestimate policy success, while
-            <code>WEAVER</code> better matches real rollouts than Ctrl-World.
-            The setting is difficult because rollouts span up to 40 seconds and require
-            long-horizon visual prediction; Pour Beans is especially challenging
-            due to granular dynamics. After finetuning, <code>WEAVER</code>-FT
-            further improves agreement and is better at capturing outcomes across policies. 
+            We replay recorded real-world action trajectories open-loop in
+            <code>WEAVER</code> and label the imagined rollouts, turning the world model
+            into a sandbox for ranking policies without robot execution. Rollouts run up
+            to 40 seconds, so prediction errors compound. Pretrained world models tend to
+            underestimate policy success; <code>WEAVER</code> tracks real rollouts more
+            closely than Ctrl-World (<i>ρ</i> = 0.517 vs. 0.410). This compares the two
+            pretrained models only &mdash; both are trained on DROID with no
+            task-specific finetuning.
+          </p>
+          <p>
+            Finetuning helps both models: <code>WEAVER</code>-FT leads
+            Ctrl-World-FT on every metric (<i>ρ</i> = 0.817 vs. 0.677, MMRV 0.104 vs.
+            0.200). In the rollouts below, only <code>WEAVER</code>-FT predicts the same
+            outcome as the ground-truth rollout from the policy on Pour Beans, Stack
+            Bowls, and PnP Towel: the beans scatter across the table, the bowls stack,
+            and the towel lands inside the basket.
           </p>
           <figure class="paper-figure policy-eval-figure">
             <img
-              src="assets/sr_correlation_plot.png"
+              src="assets/sr_correlation_plot_expanded.png"
               alt="Policy evaluation plot comparing imagined and real-world success rates."
             />
             <!-- <figcaption>
@@ -577,10 +580,9 @@
       <section id="bibtex" class="section narrow">
         <h2>BibTeX</h2>
         <pre><code>@article{jain2026weaver,
-  title={WEAVER: Efficient World Models for Robot Video Prediction},
+  title={WEAVER, Better, Faster, Longer: An Effective World Model for Robotic Manipulation},
   author={Arnav Kumar Jain and Yilin Wu and Jesse Farebrother and Gokul Swamy and Andrea Bajcsy},
-  journal={CoRR},
-  volume={abs/2606.13672},
+  journal={Under review},
   year={2026}
 }</code></pre>
       </section>
@@ -588,8 +590,7 @@
 
     <footer class="footer">
       <p>
-        Website layout inspired by classic academic project pages, including
-        the NeRFies-style template used by FOREWARN.
+        Website layout inspired by classic academic project pages.
       </p>
     </footer>
     <script>
